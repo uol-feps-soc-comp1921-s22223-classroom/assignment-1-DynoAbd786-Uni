@@ -3,12 +3,13 @@
 
 #define SUCCESS 0
 #define BAD_ARGS 1
-#define BAD_FILE 2
+#define BAD_INPUT_FILE 2
 #define BAD_MAGIC_NUMBER 3
 #define BAD_DIM 4
 #define BAD_MALLOC 5
 #define BAD_DATA 6
 #define BAD_OUTPUT 7
+#define BAD_OUTPUT_FILE 8
 #define MAGIC_NUMBER 0x6265
 #define MAX_DIMENSION 262144
 #define MIN_DIMENSION 1
@@ -16,12 +17,19 @@
 int main(int argc, char **argv)
     { // main
 
+    // Provide the user with correct usage if no arguements are provided
+    if (argc == 1)
+    {
+        printf("Usage: ebfEcho file1 file2");
+        return SUCCESS;
+    }
+
     // validate that user has enter 2 arguments (plus the executable name)
     if (argc != 3)
-        { // check arg count
+    { // check arg count
         printf("ERROR: Bad Arguments\n");
         return BAD_ARGS;
-        } // check arg count
+    } // check arg count
 
     // create a char array to hold magic number
     // and cast to short
@@ -34,36 +42,36 @@ int main(int argc, char **argv)
     long numBytes;
 
     // open the input file in read mode
-    FILE *inputFile = fopen(argv[1], "r");
+     FILE *inputFile = fopen(argv[1], "r");
     // check file opened successfully
     if (!inputFile)
-        { // check file pointer
-        printf("ERROR: Bad File Name\n");
-        return BAD_FILE;
-        } // check file pointer
-
+    { // check file pointer
+        printf("ERROR: Bad File Name (%s)\n", argv[1]);
+        return BAD_INPUT_FILE;
+    } // check file pointer
+    
     // get first 2 characters which should be magic number
     magicNumber[0] = getc(inputFile);
     magicNumber[1] = getc(inputFile);
 
     // checking against the casted value due to endienness.
     if (*magicNumberValue != MAGIC_NUMBER)
-        { // check magic number
-        printf("ERROR: Bad Magic Number\n");
-        return BAD_FILE;
-        } //check magic number
+    { // check magic number
+        printf("ERROR: Bad Magic Number (%s)\n", argv[1]);
+        return BAD_MAGIC_NUMBER;
+    } //check magic number
 
     // scan for the dimensions
     // and capture fscanfs return to ensure we got 2 values.
     int check = fscanf(inputFile, "%d %d", &height, &width);
     if (check != 2 || height < MIN_DIMENSION || width < MIN_DIMENSION || height > MAX_DIMENSION || width > MAX_DIMENSION)
-        { // check dimensions
+    { // check dimensions
         // close the file as soon as an error is found
         fclose(inputFile);
         // print appropriate error message and return
-        printf("ERROR: Bad Dimensions\n");
+        printf("ERROR: Bad Dimensions (%s)\n", argv[1]);
         return BAD_DIM;
-        } // check dimensions
+    } // check dimensions
 
     // caclulate total size and allocate memory for array
     numBytes = height * width;
@@ -73,7 +81,7 @@ int main(int argc, char **argv)
     if (imageData == NULL)
         { // check malloc
         fclose(inputFile);
-        printf("ERROR: Malloc Failed\n");
+        printf("ERROR: Image Malloc Failed\n");
         return BAD_MALLOC;
         } // check malloc
 
@@ -101,8 +109,8 @@ int main(int argc, char **argv)
     if (outputFile == NULL)
         { // validate output file
         free(imageData);
-        printf("ERROR: Bad File Name\n");
-        return BAD_FILE;
+        printf("ERROR: Bad Output(%s)\n", argv[2]);
+        return BAD_OUTPUT_FILE;
         } // validate output file
 
     // write the header data in one block
