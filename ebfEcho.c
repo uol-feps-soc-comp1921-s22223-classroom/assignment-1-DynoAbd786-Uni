@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 #define SUCCESS 0
 #define BAD_ARGS 1
@@ -13,6 +15,7 @@
 #define MAGIC_NUMBER 0x6265
 #define MAX_DIMENSION 262144
 #define MIN_DIMENSION 1
+
 
 int main(int argc, char **argv)
     { // main
@@ -38,7 +41,7 @@ int main(int argc, char **argv)
 
     // create and initialise variables used within code
     int width = 0, height = 0;
-    unsigned int *imageData;
+    unsigned int **imageData;
     long numBytes;
 
     // open the input file in read mode
@@ -75,30 +78,160 @@ int main(int argc, char **argv)
 
     // caclulate total size and allocate memory for array
     numBytes = height * width;
-    imageData = (unsigned int *)malloc(numBytes * sizeof(unsigned int));
+    imageData = (unsigned int **)malloc(numBytes * sizeof(unsigned int*));
 
     // if malloc is unsuccessful, it will return a null pointer
     if (imageData == NULL)
-        { // check malloc
+    { // check malloc
         fclose(inputFile);
         printf("ERROR: Image Malloc Failed\n");
         return BAD_MALLOC;
-        } // check malloc
+    } // check malloc
 
-    // read in each grey value from the file
-    for (int current = 0; current < numBytes; current++)
-        { // reading in
-        check = fscanf(inputFile, "%u", &imageData[current]);
-        // validate that we have captured 1 pixel value
-        if (check != 1)
-            { // check inputted data
+    unsigned int* dataBlock = (unsigned int*) malloc(numBytes * sizeof(unsigned int));
+
+    // if malloc is unsucessful, it will return a null pointer
+    if (dataBlock == NULL)
+    { // check malloc
+        free(imageData);
+        fclose(inputFile);
+        printf("ERROR: Image Malloc Failed\n");
+        return BAD_MALLOC;
+    } // check malloc
+
+    // pointer arithmetic to set up 2D array 
+    for (int row = 0; row < height; row++)
+    {
+        imageData[row] = dataBlock + row * width;
+    }
+
+    // set up quantity for worst case scenario of integer line ups (2 digit ints plus space across the width, with newline char at the end)
+    long Max_Char_Bytes = sizeof(char)*3*(width + 1);
+    // malloc empty buffer to store 1 line of data into as type char *
+    char *input = (char *) malloc(Max_Char_Bytes);
+
+    // if malloc is unsucessful, it will return a null pointer
+    if (input == NULL)
+    { // check malloc
+        free(imageData);
+        free(dataBlock);
+        fclose(inputFile);
+        printf("ERROR: Image Malloc Failed\n");
+        return BAD_MALLOC;
+    } // check malloc
+
+
+    // check to see if fgets has cycled to next line (sitting on line with the magic numbers currently)
+    if (fgets(input, sizeof(input), inputFile) == NULL)
+    {
+        // ensure that allocated data is freed before exit.
+        free(imageData);
+        free(dataBlock);
+        free(input);
+        fclose(inputFile);        
+        printf("ERROR: Bad Data (%s)\n", argv[1]);
+        return BAD_DATA;
+    }
+
+    // malloc an array of pointers to unsigned ints
+    // used to store numbers when converted from char *input array
+    unsigned int *inputIntArray = (unsigned int *) malloc(sizeof(unsigned int) * (width + 1));
+
+    if (inputIntArray == NULL)
+    { // check malloc
+        free(imageData);
+        free(dataBlock);
+        free(input);
+        fclose(inputFile);
+        printf("ERROR: Image Malloc Failed\n");
+        return BAD_MALLOC;
+    } // check malloc
+
+    // read in each grey value from the file, line by line
+    for (int currentRow = 0; currentRow < height; currentRow++)
+    { // reading in row
+        // read in line on row. Error check to see if line has been sucessfully read
+        if (fgets(input, Max_Char_Bytes, inputFile) == NULL)
+        {
             // ensure that allocated data is freed before exit.
             free(imageData);
+            free(dataBlock);
+            free(input);
+            free(inputIntArray);
             fclose(inputFile);
-            printf("ERROR: Bad Data\n");
+            printf("ERROR: Bad Data (%s)\n", argv[1]);
             return BAD_DATA;
-            } // check inputted data
-        } // reading in
+        }
+
+        // find location of \n inside input string
+        int len = strcspn(input, "\n");
+        // and overwrite it to a null char (helps with error checking)
+        input[len] = '\0';
+
+        // separate array of chars according to whitespace char
+        char *token = strtok(input, " ");
+        // and keep an account of how many times this has happened
+        int sizeOfIntArray = 0;
+
+        // separate the char *array until end of string
+        while (token != NULL)
+        {
+            // write the number obtained from the char *array to the array of ints, according to the incrementing variable sizeOfArray
+            inputIntArray[sizeOfIntArray] = atoi(token);
+            sizeOfIntArray++;
+            token = strtok(NULL, " ");
+        }        
+
+        // BAD DATA CHECK: checks to see if the sizeOfIntArray matches the inputted width
+        if (sizeOfIntArray != width)
+        {
+            // ensure that allocated data is freed before exit.
+            free(imageData);
+            free(dataBlock);
+            free(input);
+            free(inputIntArray);
+            fclose(inputFile);
+            printf("ERROR: Bad Data (%s)\n", argv[1]);
+            return BAD_DATA;
+        }
+        
+        // for every element inside the line
+        for (int currentColumn = 0; currentColumn < width; currentColumn++)
+        {
+            // BAD DATA CHECK: check if data collected is within permitted ranges
+            if (inputIntArray[currentColumn] < 0 || inputIntArray[currentColumn] > 31)
+            {
+                // ensure that allocated data is freed before exit.
+                free(imageData);
+                free(dataBlock);
+                free(input);
+                free(inputIntArray);
+                fclose(inputFile);
+                printf("ERROR: Bad Data (%s)\n", argv[1]);
+                return BAD_DATA;
+            }
+
+            // writes every element of the line to the respective position in the imageData array
+            imageData[currentRow][currentColumn] = inputIntArray[currentColumn];
+        }
+    }
+
+    // validate there are no more rows of data to read from
+    if (fgets(input, Max_Char_Bytes, inputFile) != NULL)
+    {
+        // free all necessary data before exiting
+        free(imageData);
+        free(dataBlock);
+        free(input);
+        free(inputIntArray);
+        fclose(inputFile);
+        printf("ERROR: Bad Data (%s)\n", argv[1]);
+        return BAD_DATA;
+    }
+
+    // free char *array and pointer to unsigned int array since the purpose of these has been fulfilled
+    free(input);
+    free(inputIntArray);
 
     // now we have finished using the inputFile we should close it
     fclose(inputFile);
@@ -108,9 +241,11 @@ int main(int argc, char **argv)
     // validate that the file has been opened correctly
     if (outputFile == NULL)
         { // validate output file
-        free(imageData);
-        printf("ERROR: Bad Output(%s)\n", argv[2]);
-        return BAD_OUTPUT_FILE;
+            // free malloc'd data before exiting
+            free(imageData);
+            free(dataBlock);
+            printf("ERROR: Bad Output(%s)\n", argv[2]);
+            return BAD_OUTPUT_FILE;
         } // validate output file
 
     // write the header data in one block
@@ -118,28 +253,87 @@ int main(int argc, char **argv)
     // and use the return from fprintf to check that we wrote.
     if (check == 0) 
         { // check write
-        fclose(outputFile);
-        free(imageData);
-        printf("ERROR: Bad Output\n");
-        return BAD_OUTPUT;
-        } // check write
-
-    // iterate though the array and print out pixel values
-    for (int current = 0; current < numBytes; current++)
-        { // writing out
-        // if we are at the end of a row ((current+1)%width == 0) then write a newline, otherwise a space.
-        check = fprintf(inputFile, "%u%c", imageData[current], ((current + 1) % width) ? ' ' : '\n');
-        if (check == 0)
-            { // check write
-            fclose(outputFile);
             free(imageData);
+            free(dataBlock);
+            fclose(outputFile);
             printf("ERROR: Bad Output\n");
             return BAD_OUTPUT;
+        } // check write
+
+
+    // iterate though the array and print out pixel values
+    for (int currentRow = 0; currentRow < height; currentRow++)
+    { // writing out row
+        for (int currentColumn = 0; currentColumn < width; currentColumn++)
+        { // writing out column
+            check = fprintf(outputFile, "%u", imageData[currentRow][currentColumn]);
+            // validate if output to file was sucessful
+            if (check == 0)
+            { // check write
+                fclose(outputFile);
+                free(imageData);
+                printf("ERROR: Bad Output\n");
+                return BAD_OUTPUT;
             } // check write
-        } // writing out
+
+            // if end of line has not been reached
+            if ((currentColumn + 1) / width != 1)
+            {
+                // output whitespace to file
+                check = fprintf(outputFile, " ");
+                
+                // validate if output to file was sucessful
+                if (check == 0)
+                { // check write
+                    fclose(outputFile);
+                    free(imageData);
+                    printf("ERROR: Bad Output\n");
+                    return BAD_OUTPUT;
+                } // check write
+            }
+            // else if end of line is reached, but end of row has not been reached
+            else if ((currentColumn + 1) / width == 1 && currentRow != height - 1)
+            {
+                // output newline to file
+                check = fprintf(outputFile, "\n");
+                
+                // validate if output to file was sucessful
+                if (check == 0)
+                { // check write
+                    fclose(outputFile);
+                    free(imageData);
+                    printf("ERROR: Bad Output\n");
+                    return BAD_OUTPUT;
+                } // check write
+            }
+        }       
+    } // writing out
+
+    // for (int currentColumn = 0; currentColumn < width - 1; currentColumn++)
+    // {
+    //     check = fprintf(outputFile, "%u ", imageData[height - 1][currentColumn]);
+    //     if (check == 0)
+    //     { // check write
+    //         fclose(outputFile);
+    //         free(imageData);
+    //         printf("ERROR: Bad Output\n");
+    //         return BAD_OUTPUT;
+    //     } // check write
+    // }
+
+    // check = fprintf(outputFile, "%u", imageData[height - 1][width - 1]);
+    // if (check == 0)
+    // { // check write
+    //     fclose(outputFile);
+    //     free(imageData);
+    //     printf("ERROR: Bad Output\n");
+    //     return BAD_OUTPUT;
+    // } // check write
+
 
     // free allocated memory before exit
     free(imageData);
+    free(dataBlock);
     // close the output file before exit
     fclose(outputFile);
 
