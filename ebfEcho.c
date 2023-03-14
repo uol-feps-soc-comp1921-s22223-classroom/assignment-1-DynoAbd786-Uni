@@ -309,28 +309,6 @@ int main(int argc, char **argv)
         }       
     } // writing out
 
-    // for (int currentColumn = 0; currentColumn < width - 1; currentColumn++)
-    // {
-    //     check = fprintf(outputFile, "%u ", imageData[height - 1][currentColumn]);
-    //     if (check == 0)
-    //     { // check write
-    //         fclose(outputFile);
-    //         free(imageData);
-    //         printf("ERROR: Bad Output\n");
-    //         return BAD_OUTPUT;
-    //     } // check write
-    // }
-
-    // check = fprintf(outputFile, "%u", imageData[height - 1][width - 1]);
-    // if (check == 0)
-    // { // check write
-    //     fclose(outputFile);
-    //     free(imageData);
-    //     printf("ERROR: Bad Output\n");
-    //     return BAD_OUTPUT;
-    // } // check write
-
-
     // free allocated memory before exit
     free(imageData);
     free(dataBlock);
