@@ -10,39 +10,54 @@
 // frees 1 data entry from the type ebfData
 void freeData(ebfData *data)
 {
+    // checks if imageData has been malloc'd
     if (data->imageData != NULL)
     {
+        // free and dereference imageData to NULL to avoid hanging pointer
         free(data->imageData);
         data->imageData = NULL;
     }
 
+    // checks if dataBlock has been malloc'd
     if (data->dataBlock != NULL)
     {
+        // free and dereference dataBlock to NULL to avoid hanging pointer
         free(data->dataBlock);
         data->dataBlock = NULL;
     }
 
+    // checks if data struct has been malloc'd
     if (data != NULL)
     {
+        // free and dereference data struct to NULL to avoid hanging pointer
         free(data);
         data = NULL;
     }
 }
 
+// mallocs an uninitialised struct of type ebfData to store file information to
 ebfData *mallocEbf()
 {
     ebfData *data = (ebfData *) malloc(sizeof(ebfData));
     return data;
 }
 
+// frees an array of structs (for comp files)
 void freeDataArray(ebfData *dataToCompare[])
 {
+    // for the 2 structs in the file storing data 
     for (int fileNumber = 0; fileNumber < MAX_FILE_COMPARISON; fileNumber++)
     {
-        freeData(dataToCompare[fileNumber]);
+        // check if the struct at position fileNumber has some data. if so, free the struct
+        if (dataToCompare[fileNumber] != NULL)
+        {
+            freeData(dataToCompare[fileNumber]);
+        }
     }
 }
 
+
+// may be useful later, see ebfStruct
 // void freeData(void* data)
 // {
 //     switch (((eDataType*)data)->type) {

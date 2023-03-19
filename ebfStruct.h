@@ -39,11 +39,12 @@
 // ebc->type = EBC_TYPE;
 
 
+
+// struct for storing data from an ebf file
 typedef struct 
 {
     // eDataType type;
     unsigned char magicNumber[2]; // the 2nd char can be used for free identifier (SWITCH CASE)
-    unsigned short *magicNumberValue;
     int width, height;
     long numBytes;
     unsigned int **imageData;

@@ -9,12 +9,13 @@
 #include "ebfReadFromInputFile.h"
 
 // executes a series of funcions to gather and check all data from a file
+// returns respected error code to the error that may have occured in the file, 0 if successful
 int getFileData(ebfData *inputData, char* filename, FILE *inputFile)
 {   
     // set first 2 characters which should be magic number
     getMagicNumber(inputFile, inputData);
 
-    // checking against the casted value due to endienness.
+    // checking if the magic number matches the known magic number value
     if (checkMagicNumberValue(inputData, filename))
     { // check magic number
         return BAD_MAGIC_NUMBER;
@@ -31,12 +32,15 @@ int getFileData(ebfData *inputData, char* filename, FILE *inputFile)
     } // check dimensions
 
     // set up data array to store pixel values later
+    // checks for any error codes that may have been returned
     check = setImageDataArray(inputData, inputFile);
     if (check != 0)
     {
         return check;
     }
 
+    // get image data from the file and store it to the struct 
+    // checks for any error codes that may have been returned
     check = getImageDataArray(inputData, inputFile, filename);
     if (check != 0)
     {
@@ -48,7 +52,7 @@ int getFileData(ebfData *inputData, char* filename, FILE *inputFile)
 }
 
 
-// read in magic number from file 
+// read in magic number from file are store it to the struct
 void getMagicNumber(FILE *inputFile, ebfData *data)
 {
     data->magicNumber[0] = getc(inputFile);
@@ -56,10 +60,12 @@ void getMagicNumber(FILE *inputFile, ebfData *data)
 }
 
 
-// finds, stores and returns magic number value
+// finds and returns error (1) if magic number values do not match
 int checkMagicNumberValue(ebfData *data, char *filename)
 {
+    // casting chars to unsigned short 
     unsigned short *magicNumberValue = (unsigned short *) data->magicNumber;
+    // checking against the casted value due to endienness.
     if (badMagicNumber(magicNumberValue, filename))
     {
         return 1;
@@ -69,6 +75,7 @@ int checkMagicNumberValue(ebfData *data, char *filename)
 
 
 // read in dimensions and return number of values scanned
+// returns number of values read from file, or -1 for error
 /* NEEDS ERROR CHECKING PER LINE */
 int getDimensions(ebfData *data, FILE *inputFile)
 {
@@ -76,7 +83,8 @@ int getDimensions(ebfData *data, FILE *inputFile)
     return check;
 }
 
-
+// mallocs an array for the data to be stored in.
+// returns any error code that may arise during the malloc, 0 for no errors
 int setImageDataArray(ebfData *data, FILE *inputFile)
 {
     // caclulate total size and allocate memory for array

@@ -13,12 +13,11 @@
 
 
 int main(int argc, char **argv)
-    { // main
-
+{ // main
     /*      CHEKCING ARGUEMENTS     */
 
     // Provide the user with correct usage if no arguements are provided
-    if (noArguements(argc))
+    if (noArguements(argc, argv))
     {
         return SUCCESS;
     }
@@ -32,15 +31,18 @@ int main(int argc, char **argv)
 
     /*      TAKING INPUT FROM FILES      */
 
-    // initialise an empty array to store file data
+    // initialise an empty array to store file data (max files to compare is 2)
     ebfData *dataToCompare[MAX_FILE_COMPARISON];
 
+    // looping through the number of files to compare
     for (int fileNumber = 0; fileNumber < MAX_FILE_COMPARISON; fileNumber++)
     {
+        // allocate data for array of type ebf
         dataToCompare[fileNumber] = mallocEbf();
         // checking if struct has been malloc'd
         if (badMalloc(dataToCompare[fileNumber]))
         {
+            freeDataArray(dataToCompare);
             return BAD_MALLOC;
         }
 
@@ -67,44 +69,20 @@ int main(int argc, char **argv)
     }
     
 
-    // compare the data from the two files:
-    
-    // start with magic number values
-    if (*magicNumberValue1 != *magicNumberValue2)
-        { // free and exit
-        free(imageData1);
-        free(imageData2);
+    /*      COMPARING DATA BETWEEN FILES      */
+
+    // running function to check if file data is the same
+    // prints different if return value is 1, identical if return value is 0
+    if (compareData(dataToCompare[0], dataToCompare[1]))
+    {
         printf("DIFFERENT\n");
-        return SUCCESS;
-        } // free and exit
+    }
+    else
+    {
+        printf("IDENTICAL\n");
+    }
 
-    // check dimensions
-    if ((height1 != height2) || (width1 != width2))
-        { // free and exit
-        free(imageData1);
-        free(imageData2);
-        printf("DIFFERENT\n");
-        return SUCCESS;
-        } // free and exit
-
-    // and check the pixel values
-    for (int n=0; n<numBytes1; n++)
-        {
-        if(imageData1[n]!=imageData2[n])
-            { // free and exit
-            free(imageData1);
-            free(imageData2);
-            printf("DIFFERENT\n");
-            return SUCCESS;
-            } // free and exit
-        }
-
-
-    // free allocated memory before exit
-    free(imageData1);
-    free(imageData2);
-
-    // if we have not exited on different data, must be identical
-    printf("IDENTICAL\n");
+    // free the data array and close the progran with return value SUCCESS.
+    freeDataArray(dataToCompare);
     return SUCCESS;
-    } // main()
+} // main()
