@@ -1,9 +1,11 @@
-typedef struct ebfFile 
+// Struct type for ebf file
+
+typedef struct ebfData 
 {
     unsigned char magicNumber[2];
-    unsigned short *magicNumberValue = (unsigned short *)magicNumber;
-    int width = 0, height = 0;
-    unsigned int *imageData;
+    int width, height;
     long numBytes;
-    
+    unsigned int **imageData;
+    unsigned int *dataBlock;
 }
+ebfData;
