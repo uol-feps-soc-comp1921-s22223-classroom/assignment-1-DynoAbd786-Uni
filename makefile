@@ -9,8 +9,15 @@ CC     = gcc
 # -g enables the use of GDB
 CFLAGS = -std=c99 -Wall -Werror -g
 # this is your list of executables which you want to compile with all
-EXE = ebfEcho ebfComp
-SRC = 
+EXE = ebfEcho ebfComp 
+
+SRC = ebfEcho.c ebfComp.c ebfErrorChecking.c ebfReadFromInputFile.c ebfWriteToOutputFile.c loadFiles.c memoryManagement.c compareFiles.c
+
+OBJ = $(SRCS:.c=.o)
+
+dependencies = ebfErrorChecking.h ebfStruct.h ebfReadFromInputFile.h ebfWriteToOutputFile.h loadFiles.h memoryManagement.h compareFiles.h
+
+
 
 # we put 'all' as the first command as this will be run if you just enter 'make'
 all: ${EXE}
@@ -26,7 +33,7 @@ clean:
 # ebfEcho.o: ebfEcho.c
 # gcc -c -std=c99 -g ebfEcho.c -o ebfEcho.o
 
-%.o: %.c
+%.o: %.c $(dependencies)
 	$(CC) -c $(CFLAGS) $< -o $@
 
 # for each executable, you need to tell the makefile the 'recipe' for your file
@@ -34,8 +41,29 @@ clean:
 # but as you refactor and add more .c and .h files
 # these recipes will become more complex.
 
-ebfEcho: ebfEcho.o
+
+
+ebfEcho: ebfEcho.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o
 	$(CC) $(CCFLAGS) $^ -o $@
 
-ebfComp: ebfComp.o
+
+ebfErrorChecking: ebfErrorChecking.o 
+	$(CC) $(CCFLAGS) $^ -o $@
+
+ebfWriteToOutputFile: ebfWriteToOutputFile.o memoryManagement.o 
+	$(CC) $(CCFLAGS) $^ -o $@
+
+ebfReadFromInputFile: ebfReadFromInputFile.o memoryManagement.o 
+	$(CC) $(CCFLAGS) $^ -o $@
+
+loadFiles: loadFiles.o
+	$(CC) $(CCFLAGS) $^ -o $@
+
+memoryManagement: memoryManagement.o
+	$(CC) $(CCFLAGS) $^ -o $@
+
+ebfComp: ebfComp.o 
+	$(CC) $(CCFLAGS) $^ -o $@
+
+compareFiles: compareFiles.o
 	$(CC) $(CCFLAGS) $^ -o $@

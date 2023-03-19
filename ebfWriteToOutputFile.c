@@ -1,67 +1,76 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "ebfStruct.h"
 #include "ebfErrorChecking.h"
+#include "memoryManagement.h"
+#include "ebfWriteToOutputFile.h"
+
+int outputFileData(ebfData *inputData, char *filename, FILE *outputFile)
+{
+    // output to file and validate for success (0 means success)
+    if (outputHeader(inputData, outputFile) != 0)
+    {
+        return BAD_OUTPUT;
+    }
+
+    if (outputImageData(inputData, outputFile) != 0)
+    {
+        return BAD_OUTPUT;
+    }
+
+    return 0;
+}
+
 
 // writes the header data and length, width parameters to the output file
-int outputHeader(ebfData data, FILE *outputFile)
+int outputHeader(ebfData *data, FILE *outputFile)
 {
     // write the header data in one block
     // and use the return from fprintf to check that we wrote.
-    if (BAD_OUTPUT(fprintf(outputFile, "eb\n%d %d\n", height, width))) 
-        { // check write
-            free(imageData);
-            free(dataBlock);
-            fclose(outputFile);
-            printf("ERROR: Bad Output\n");
-            return BAD_OUTPUT;
-        } // check write
+    if (badOutput(fprintf(outputFile, "eb\n%d %d\n", data->height, data->width))) 
+    { // check write
+        return BAD_OUTPUT;
+    } // check write
+    return 0;
 }
 
 // writes all pixel values to the output file
-int outputImageData(ebfData data, FILE *outputFile)
+int outputImageData(ebfData *data, FILE *outputFile)
 {
     // iterate though the array and print out pixel values
-    for (int currentRow = 0; currentRow < data.height; currentRow++)
+    for (int currentRow = 0; currentRow < data->height; currentRow++)
     { // writing out row
-        for (int currentColumn = 0; currentColumn < data.width; currentColumn++)
+        for (int currentColumn = 0; currentColumn < data->width; currentColumn++)
         { // writing out column
             // validate if output to file was sucessful
-            if (BAD_OUTPUT(fprintf(outputFile, "%u", data.imageData[currentRow][currentColumn])))
+            if (badOutput(fprintf(outputFile, "%u", data->imageData[currentRow][currentColumn])))
             { // check write
-                fclose(outputFile);
-                free(data.imageData);
-                free(data.dataBlock);
-                printf("ERROR: Bad Output\n");
                 return BAD_OUTPUT;
             } // check write
 
             // if end of line has not been reached
-            if ((currentColumn + 1) / width != 1)
+            if ((currentColumn + 1) / data->width != 1)
             {
                 // output whitespace to file
                 // validate if output to file was sucessful
-                if (BAD_OUTPUT(fprintf(outputFile, " ")))
+                if (badOutput(fprintf(outputFile, " ")))
                 { // check write
-                    fclose(outputFile);
-                    free(data.imageData);
-                    free(data.dataBlock);
                     return BAD_OUTPUT;
                 } // check write
             }
             // else if end of line is reached, but end of row has not been reached
-            else if ((currentColumn + 1) / width == 1 && currentRow != height - 1)
+            else if ((currentColumn + 1) / data->width == 1 && currentRow != data->height - 1)
             {
                 // output newline to file               
                 // validate if output to file was sucessful
-                if (BAD_OUTPUT(fprintf(outputFile, "\N")))
+                if (badOutput(fprintf(outputFile, "\n")))
                 { // check write
-                    fclose(outputFile);
-                    free(data.imageData);
-                    free(data.dataBlock);
                     return BAD_OUTPUT;
                 } // check write
             }
         }       
     } // writing out
+
+    return 0;
 }
