@@ -1,5 +1,7 @@
 // Header file for all error checking functions
+// all function return 1 for any error detected, 0 otherwise
 
+// macors to define different return values, pixel value and dimension range, and magic number for the program
 #define SUCCESS 0
 #define BAD_ARGS 1
 #define BAD_FILE 2
@@ -15,7 +17,7 @@
 #define MAX_PIXEL_VALUE 31
 
 
-int noArguements(int argc);
+int noArguements(int argc, char **argv);
 
 int badArguements(int argc);
 

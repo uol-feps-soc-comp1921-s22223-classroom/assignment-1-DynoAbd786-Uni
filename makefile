@@ -62,7 +62,7 @@ loadFiles: loadFiles.o
 memoryManagement: memoryManagement.o
 	$(CC) $(CCFLAGS) $^ -o $@
 
-ebfComp: ebfComp.o 
+ebfComp: ebfComp.o memoryManagement.o loadFiles.o ebfErrorChecking.o ebfReadFromInputFile.o compareFiles.o
 	$(CC) $(CCFLAGS) $^ -o $@
 
 compareFiles: compareFiles.o

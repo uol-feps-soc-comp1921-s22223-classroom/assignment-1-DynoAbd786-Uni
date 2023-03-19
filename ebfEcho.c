@@ -11,14 +11,12 @@
 #include "ebfWriteToOutputFile.h"
 
 
-
 int main(int argc, char **argv)
 { // main
-
     /*      CHEKCING ARGUEMENTS     */
 
     // Provide the user with correct usage if no arguements are provided
-    if (noArguements(argc))
+    if (noArguements(argc, argv))
     {
         return SUCCESS;
     }
@@ -32,7 +30,7 @@ int main(int argc, char **argv)
 
     /*      TAKING INPUT FROM FILE      */
 
-    // set up and store data from the ebf file
+    // malloc a struct of type ebfData to store data to
     ebfData *inputData = mallocEbf();
     // checking if struct has been malloc'd
     if (badMalloc(inputData))
@@ -65,7 +63,7 @@ int main(int argc, char **argv)
 
     /*      WRITING TO FILE     */
 
-    // get and open the input file in read mode
+    // get and open the output file in write mode
     char *outputFilename = argv[2];
     FILE *outputFile = loadOutputFile(outputFilename);
     // validate that the file has been opened correctly
@@ -76,7 +74,7 @@ int main(int argc, char **argv)
 
     // output to file
     errCode = outputFileData(inputData, outputFilename, outputFile);
-    // checking for no rteturn errors
+    // checking for any error codes
     if (errCode != 0)
     {
         // exit with the error code and free any data used in the program

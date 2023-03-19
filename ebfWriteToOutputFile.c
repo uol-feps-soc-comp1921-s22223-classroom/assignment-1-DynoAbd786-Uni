@@ -6,14 +6,17 @@
 #include "memoryManagement.h"
 #include "ebfWriteToOutputFile.h"
 
+// executes a series of functions to write to a file
+// returns respective error codes if output has failed, otherwise 0 is successful
 int outputFileData(ebfData *inputData, char *filename, FILE *outputFile)
 {
-    // output to file and validate for success (0 means success)
+    // output header to file and validate for success (0 means success)
     if (outputHeader(inputData, outputFile) != 0)
     {
         return BAD_OUTPUT;
     }
 
+    // output image data to file and validate for success (0 means success)
     if (outputImageData(inputData, outputFile) != 0)
     {
         return BAD_OUTPUT;
@@ -24,6 +27,7 @@ int outputFileData(ebfData *inputData, char *filename, FILE *outputFile)
 
 
 // writes the header data and length, width parameters to the output file
+// returns error code if output has failed, 0 otherwise
 int outputHeader(ebfData *data, FILE *outputFile)
 {
     // write the header data in one block
@@ -36,6 +40,7 @@ int outputHeader(ebfData *data, FILE *outputFile)
 }
 
 // writes all pixel values to the output file
+// returns error code if output has failed, 0 if successful
 int outputImageData(ebfData *data, FILE *outputFile)
 {
     // iterate though the array and print out pixel values
@@ -70,7 +75,7 @@ int outputImageData(ebfData *data, FILE *outputFile)
                 } // check write
             }
         }       
-    } // writing out
+    }
 
     return 0;
 }
