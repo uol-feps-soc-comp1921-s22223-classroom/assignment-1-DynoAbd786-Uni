@@ -1,11 +1,52 @@
 // Struct type for ebf file
 
-typedef struct ebfData 
+// gonna need this later i think
+// this is me asking chatGPT the following:
+// "lets say i create future structs called ebuData and ebcData. 
+// how would i free each one if i dont know which one is being used in the code"
+// so...
+
+// typedef enum allows me to know what struct i am using when i need to know 
+// (particularly for freeing structs within 1 contained function)
+// typedef enum {
+//     EBF_TYPE,
+//     EBU_TYPE,
+//     EBC_TYPE
+// } eDataType;
+
+// typedef struct {
+//     eDataType type;
+//     // other fields...
+// } ebfData;
+
+// typedef struct {
+//     eDataType type;
+//     // other fields...
+// } ebuData;
+
+// typedef struct {
+//     eDataType type;
+//     // other fields...
+// } ebcData;
+
+// ebfData* ebf = (ebfData*) malloc(sizeof(ebfData));
+// ebf->type = EBF_TYPE;
+
+// ebuData* ebu = (ebuData*) malloc(sizeof(ebuData));
+// ebu->type = EBU_TYPE;
+
+// ebcData* ebc = (ebcData*) malloc(sizeof(ebcData));
+// ebc->type = EBC_TYPE;
+
+
+typedef struct 
 {
-    unsigned char magicNumber[2];
+    // eDataType type;
+    unsigned char magicNumber[2]; // the 2nd char can be used for free identifier (SWITCH CASE)
+    unsigned short *magicNumberValue;
     int width, height;
     long numBytes;
     unsigned int **imageData;
     unsigned int *dataBlock;
-}
+} 
 ebfData;

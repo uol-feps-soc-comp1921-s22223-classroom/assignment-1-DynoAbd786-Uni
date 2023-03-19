@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#include "loadFiles.h"
+
 // loads input file in read mode
 FILE *loadInputFile(char *filename)
 {

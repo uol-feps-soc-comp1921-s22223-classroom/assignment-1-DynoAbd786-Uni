@@ -5,116 +5,150 @@
 
 #include "ebfStruct.h"
 #include "ebfErrorChecking.h"
+#include "memoryManagement.h"
+#include "ebfReadFromInputFile.h"
+
+// executes a series of funcions to gather and check all data from a file
+int getFileData(ebfData *inputData, char* filename, FILE *inputFile)
+{   
+    // set first 2 characters which should be magic number
+    getMagicNumber(inputFile, inputData);
+
+    // checking against the casted value due to endienness.
+    if (checkMagicNumberValue(inputData, filename))
+    { // check magic number
+        return BAD_MAGIC_NUMBER;
+    } // check magic number
+
+
+    // scan for the dimensions
+    // and capture fscanfs return to ensure we got 2 values.
+    int check = getDimensions(inputData, inputFile);
+    // check if dimensions satisfy requirements
+    if (badDimensions(inputData, check, filename))
+    { // check dimensions
+        return BAD_DIM;
+    } // check dimensions
+
+    // set up data array to store pixel values later
+    check = setImageDataArray(inputData, inputFile);
+    if (check != 0)
+    {
+        return check;
+    }
+
+    check = getImageDataArray(inputData, inputFile, filename);
+    if (check != 0)
+    {
+        return check;
+    }
+
+    // return 0 for success
+    return 0;
+}
+
 
 // read in magic number from file 
-void getMagicNumber(FILE inputFile, ebfData data)
+void getMagicNumber(FILE *inputFile, ebfData *data)
 {
-    data.magicNumber[0] = getc(inputFile);
-    data.magicNumber[1] = getc(inputFile);    
+    data->magicNumber[0] = getc(inputFile);
+    data->magicNumber[1] = getc(inputFile);
 }
 
-// finds and returns magic number value
-unsigned short *getMagicNumberValue(ebfData data)
+
+// finds, stores and returns magic number value
+int checkMagicNumberValue(ebfData *data, char *filename)
 {
-    unsigned short *magicNumberValue = (unsigned short *) data.magicNumber;
-    return *magicNumberValue;
+    unsigned short *magicNumberValue = (unsigned short *) data->magicNumber;
+    if (badMagicNumber(magicNumberValue, filename))
+    {
+        return 1;
+    }
+    return 0;
 }
+
 
 // read in dimensions and return number of values scanned
 /* NEEDS ERROR CHECKING PER LINE */
-int getDimensions(ebfData data, FILE *inputFile);
+int getDimensions(ebfData *data, FILE *inputFile)
 {
-    int check = fscanf(inputFile, "%d %d", &data.height, &data.width);
+    int check = fscanf(inputFile, "%d %d", &data->height, &data->width);
     return check;
 }
 
-int setImageDataArray(ebfData data, FILE *inputFile)
+
+int setImageDataArray(ebfData *data, FILE *inputFile)
 {
     // caclulate total size and allocate memory for array
-    data.numBytes = data.height * data.width
-    data.imageData = (unsigned int **)malloc(numBytes * sizeof(unsigned int*));
+    data->numBytes = data->height * data->width;
+    data->imageData = (unsigned int **) malloc(data->numBytes * sizeof(unsigned int*));
 
     // if malloc is unsuccessful, it will return a BAD MALLOC error code
-    if (BAD_MALLOC(data.imageData))
+    if (badMalloc(data->imageData))
     { // check malloc
-        fclose(inputFile);
         return BAD_MALLOC;
     } // check malloc
 
     // data block malloc'd to set up 2D array for imageData
-    unsigned int* dataBlock = (unsigned int*) malloc(numBytes * sizeof(unsigned int));
+    data->dataBlock = (unsigned int*) malloc(data->numBytes * sizeof(unsigned int));
 
     // if malloc is unsucessful, it will return a null pointer
-    if (BAD_MALLOC(dataBlock))
+    if (badMalloc(data->dataBlock))
     { // check malloc
-        free(imageData);
-        fclose(inputFile);
         return BAD_MALLOC;
     } // check malloc
 
     // pointer arithmetic to set up 2D array 
-    for (int row = 0; row < height; row++)
+    for (int row = 0; row < data->height; row++)
     {
-        imageData[row] = dataBlock + row * width;
+        data->imageData[row] = data->dataBlock + row * data->width;
     }
+    return 0;
 }
 
 // gets image data pixel by pixel and checks against specified parameters
 // works in line by line fashion, in case height and width of pixels doesnt match the specified parameters
-int getImageDataArray (ebfData data, FILE *inputFile, char *filename)
+int getImageDataArray(ebfData *data, FILE *inputFile, char *filename)
 {
     // set up quantity for worst case scenario of integer line ups (2 digit ints plus space across the width, with newline char at the end)
-    long Max_Char_Bytes = sizeof(char)*3*(width + 1);
+    long Max_Char_Bytes = sizeof(char)*3*(data->width + 1);
     // malloc empty buffer to store 1 line of data into as type char *
     char *input = (char *) malloc(Max_Char_Bytes);
 
     // if malloc is unsucessful, it will return a null pointer
-    if (BAD_MALLOC(input))
+    if (badMalloc(input))
     { // check malloc
-        free(data.imageData);
-        free(data.dataBlock);
-        fclose(inputFile);
         return BAD_MALLOC;
     } // check malloc
 
 
     // check to see if fgets has cycled to next line (sitting on line with the magic numbers currently)
-    if (NO_MORE_LINES(fgets(input, sizeof(input), inputFile)))
+    if (noMoreLines(fgets(input, sizeof(input), inputFile), filename))
     {
         // ensure that allocated data is freed before exit.
-        free(data.imageData);
-        free(data.dataBlock);
-        free(input);
-        fclose(inputFile);        
-        printf("ERROR: Bad Data (%s)\n", argv[1]);
+        free(input);      
         return BAD_DATA;
     }
 
     // malloc an array of pointers to unsigned ints
     // used to store numbers when converted from char *input array
-    unsigned int *inputIntArray = (unsigned int *) malloc(sizeof(unsigned int) * (width + 1));
+    unsigned int *inputIntArray = (unsigned int *) malloc(sizeof(unsigned int) * (data->width + 1));
 
-    if (BAD_MALLOC(inputIntArray))
+    if (badMalloc(inputIntArray))
     { // check malloc
-        free(data.imageData);
-        free(data.dataBlock);
-        free(input);
-        fclose(inputFile);
+        free(input);    
         return BAD_MALLOC;
     } // check malloc
 
     // read in each grey value from the file, line by line
-    for (int currentRow = 0; currentRow < height; currentRow++)
+    for (int currentRow = 0; currentRow < data->height; currentRow++)
     { // reading in row
         // read in line on row. Error check to see if line has been sucessfully read
-        if (NO_MORE_LINES(fgets(input, Max_Char_Bytes, inputFile), filename))
+        if (noMoreLines(fgets(input, Max_Char_Bytes, inputFile), filename))
         {
             // ensure that allocated data is freed before exit.
-            free(data.imageData);
-            free(data.dataBlock);
             free(input);
             free(inputIntArray);
-            fclose(inputFile);
             return BAD_DATA;
         }
 
@@ -138,48 +172,37 @@ int getImageDataArray (ebfData data, FILE *inputFile, char *filename)
         }        
 
         // BAD DATA CHECK: checks to see if the sizeOfIntArray matches the inputted width
-        if (sizeOfIntArray != width)
+        if (wrongArraySize(data, sizeOfIntArray, filename))
         {
             // ensure that allocated data is freed before exit.
-            free(data.imageData);
-            free(data.dataBlock);
             free(input);
             free(inputIntArray);
-            fclose(inputFile);
             return BAD_DATA;
         }
         
         // for every element inside the line
-        for (int currentColumn = 0; currentColumn < width; currentColumn++)
+        for (int currentColumn = 0; currentColumn < data->width; currentColumn++)
         {
             // BAD DATA CHECK: check if data collected is within permitted ranges
-            if (BAD_PIXEL_VALUE(inputIntArray[currentColumn], filename))
+            if (badPixelValue(inputIntArray[currentColumn], filename))
             {
                 // ensure that allocated data is freed before exit.
-                free(data.imageData);
-                free(data.dataBlock);
                 free(input);
                 free(inputIntArray);
-                fclose(inputFile);
-                printf("ERROR: Bad Data (%s)\n", argv[1]);
                 return BAD_DATA;
             }
 
             // writes every element of the line to the respective position in the imageData array
-            data.imageData[currentRow][currentColumn] = inputIntArray[currentColumn];
+            data->imageData[currentRow][currentColumn] = inputIntArray[currentColumn];
         }
     }
 
     // validate there are no more rows of data to read from
-    if (TOO_MANY_LINES(fgets(input, Max_Char_Bytes, inputFile)))
+    if (tooManyLines(fgets(input, Max_Char_Bytes, inputFile), filename))
     {
         // free all necessary data before exiting
-        free(imageData);
-        free(dataBlock);
         free(input);
         free(inputIntArray);
-        fclose(inputFile);
-        printf("ERROR: Bad Data (%s)\n", argv[1]);
         return BAD_DATA;
     }
 
@@ -188,4 +211,5 @@ int getImageDataArray (ebfData data, FILE *inputFile, char *filename)
     input = NULL;
     free(inputIntArray);
     inputIntArray = NULL;
+    return 0;
 }
