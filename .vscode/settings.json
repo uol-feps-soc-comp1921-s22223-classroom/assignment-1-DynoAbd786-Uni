@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "conversionfunctions.h": "c"
+    },
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/cserv1_a/soc_ug/sc22makk/programs/1/1921/Cw1/cw1",
+            "binaryPath": "/home/cserv1_a/soc_ug/sc22makk/programs/1/1921/Cw1/cw1/ebf2ebu",
+            "binaryArgs": []
+        }
+    ]
+}

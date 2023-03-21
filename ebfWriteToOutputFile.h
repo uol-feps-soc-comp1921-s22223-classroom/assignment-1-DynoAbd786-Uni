@@ -1,8 +1,31 @@
 // contains function prototypes for anything to do with writing to the output file
+// output header and image data functions take in individual variables rather than the whole struct to improve modularity (intentional design choice)
 
-int outputFileData(ebfData *inputData, char *filename, FILE *file);
+// for ebf to ebf outputs
+int outputFileData(ebfData *data, char *filename, FILE *outputFile);
 
-int outputHeader(ebfData *data, FILE *outputFile);
+int outputHeader(unsigned char *magicNumber, int height, int width, FILE *outputFile);
 
-int outputImageData(ebfData *data, FILE *outputFile);
+int outputImageData(unsigned int **imageData, int height, int width, FILE *outputFile);
+
+// for ebf to ebu outputs
+int outputFileDataEbfDirectEbu(ebfData *data, char *filename, FILE *outputFile);
+
+int outputImageDataEbfDirectEbu(unsigned int **imageData, int height, int width, FILE *outputFile);
+
+// for ebu to ebf outputs
+int outputFileDataEbuDirectEbf(ebuData *data, char *filename, FILE *outputFile);
+
+int outputImageDataEbuDirectEbf(BYTE **imageData, int height, int width, FILE *outputFile);
+
+
+// for ebu to ebu/ebc to ebc/ebu to ebc/ebc to ebu outputs
+// essentially anything that works to output binary to binary
+int outputFileDataBinary(ebuData *data, char *filename, FILE *outputFile);
+
+int outputImageDataBinary(BYTE *dataBlock, long numBytes, FILE *outputFile);
+
+/*      NEEDS SPECIALISED FUNCTIONS TO WRITE EBC FILES      */
+// may be possible to write the entire dataBlock which is of guaranteed size numBytes
+
 
