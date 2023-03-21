@@ -9,14 +9,13 @@ CC     = gcc
 # -g enables the use of GDB
 CFLAGS = -std=c99 -Wall -Werror -g
 # this is your list of executables which you want to compile with all
-EXE = ebfEcho ebfComp 
+EXE = ebfEcho ebfComp ebf2ebu
 
-SRC = ebfEcho.c ebfComp.c ebfErrorChecking.c ebfReadFromInputFile.c ebfWriteToOutputFile.c loadFiles.c memoryManagement.c compareFiles.c
+SRC = ebfEcho.c ebfComp.c ebf2ebu.c ebfErrorChecking.c ebfReadFromInputFile.c ebfWriteToOutputFile.c loadFiles.c memoryManagement.c compareFiles.c conversionFunctions.c
 
 OBJ = $(SRCS:.c=.o)
 
-dependencies = ebfErrorChecking.h ebfStruct.h ebfReadFromInputFile.h ebfWriteToOutputFile.h loadFiles.h memoryManagement.h compareFiles.h
-
+dependencies = ebfStruct.h ebfErrorChecking.h conversionFunctions.h ebfReadFromInputFile.h ebfWriteToOutputFile.h loadFiles.h memoryManagement.h compareFiles.h 
 
 
 # we put 'all' as the first command as this will be run if you just enter 'make'
@@ -43,15 +42,16 @@ clean:
 
 
 
-ebfEcho: ebfEcho.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o
+ebfEcho: ebfEcho.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
 	$(CC) $(CCFLAGS) $^ -o $@
-
 
 ebfErrorChecking: ebfErrorChecking.o 
 	$(CC) $(CCFLAGS) $^ -o $@
 
-ebfWriteToOutputFile: ebfWriteToOutputFile.o memoryManagement.o 
+
+ebfWriteToOutputFile: ebfWriteToOutputFile.o memoryManagement.o conversionFunctions.o ebfErrorChecking.o
 	$(CC) $(CCFLAGS) $^ -o $@
+
 
 ebfReadFromInputFile: ebfReadFromInputFile.o memoryManagement.o 
 	$(CC) $(CCFLAGS) $^ -o $@
@@ -66,4 +66,10 @@ ebfComp: ebfComp.o memoryManagement.o loadFiles.o ebfErrorChecking.o ebfReadFrom
 	$(CC) $(CCFLAGS) $^ -o $@
 
 compareFiles: compareFiles.o
+	$(CC) $(CCFLAGS) $^ -o $@
+
+ebf2ebu: ebf2ebu.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
+	$(CC) $(CCFLAGS) $^ -o $@
+
+conversionFunctions: conversionFunctions.o
 	$(CC) $(CCFLAGS) $^ -o $@

@@ -1,4 +1,8 @@
-// Struct type for ebf file
+// Struct types for all files
+#include <stdint.h>
+
+// assigns type uint8_t to type BYTE for better readability
+typedef uint8_t BYTE;
 
 // gonna need this later i think
 // this is me asking chatGPT the following:
@@ -51,3 +55,17 @@ typedef struct
     unsigned int *dataBlock;
 } 
 ebfData;
+
+
+typedef struct
+{
+    unsigned char magicNumber[2]; // the 2nd char can be used for free identifier (SWITCH CASE)
+    int width, height;
+    long numBytes;
+    BYTE **imageData;
+    BYTE *dataBlock;
+}
+ebuData;
+
+
+
