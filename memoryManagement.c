@@ -6,6 +6,20 @@
 #include "memoryManagement.h"
 
 
+// mallocs an uninitialised struct of type ebfData to store file information to
+ebfData *mallocEbf()
+{
+    ebfData *data = (ebfData *) malloc(sizeof(ebfData));
+    return data;
+}
+
+// mallocs an uninitialised struct of type ebuData to store file information to
+ebuData *mallocEbu()
+{
+    ebuData *data = (ebuData *) malloc(sizeof(ebuData));
+    return data;
+}
+
 
 // frees 1 data entry from the type ebfData
 void freeData(ebfData *data)
@@ -33,13 +47,6 @@ void freeData(ebfData *data)
         free(data);
         data = NULL;
     }
-}
-
-// mallocs an uninitialised struct of type ebfData to store file information to
-ebfData *mallocEbf()
-{
-    ebfData *data = (ebfData *) malloc(sizeof(ebfData));
-    return data;
 }
 
 // frees an array of structs (for comp files)
