@@ -53,7 +53,7 @@ ebfWriteToOutputFile: ebfWriteToOutputFile.o memoryManagement.o conversionFuncti
 	$(CC) $(CCFLAGS) $^ -o $@
 
 
-ebfReadFromInputFile: ebfReadFromInputFile.o memoryManagement.o 
+ebfReadFromInputFile: ebfReadFromInputFile.o memoryManagement.o conversionFunctions.o
 	$(CC) $(CCFLAGS) $^ -o $@
 
 loadFiles: loadFiles.o
@@ -62,7 +62,7 @@ loadFiles: loadFiles.o
 memoryManagement: memoryManagement.o
 	$(CC) $(CCFLAGS) $^ -o $@
 
-ebfComp: ebfComp.o memoryManagement.o loadFiles.o ebfErrorChecking.o ebfReadFromInputFile.o compareFiles.o
+ebfComp: ebfComp.o memoryManagement.o loadFiles.o ebfErrorChecking.o ebfReadFromInputFile.o compareFiles.o conversionFunctions.o
 	$(CC) $(CCFLAGS) $^ -o $@
 
 compareFiles: compareFiles.o

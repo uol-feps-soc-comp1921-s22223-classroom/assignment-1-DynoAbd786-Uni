@@ -72,9 +72,9 @@ int badMagicNumber(unsigned short *magicNumberValue, char *filename)
 /*      BAD DIMENSIONS      */
 // check dimensions to see if 2 values have been captured, and if dimensions are within acceptable range
 // returns 1 if requirements arent met
-int badDimensions(ebfData *data, int checkValue, char *filename)
+int badDimensions(int height, int width, int checkValue, char *filename)
 {
-    if (checkValue != 2 || data->height < MIN_DIMENSION || data->width < MIN_DIMENSION || data->height > MAX_DIMENSION || data->width > MAX_DIMENSION)
+    if (checkValue != 2 || height < MIN_DIMENSION || width < MIN_DIMENSION || height > MAX_DIMENSION || width > MAX_DIMENSION)
     { // check dimensions
         // close the file as soon as an error is found
         // print appropriate error message and return
@@ -100,6 +100,34 @@ int badMalloc(void *mallocData)
 }
 
 /*      BAD DATA        */
+
+// checks if end of file has been reached
+// returns 1 if end of file has not been reached
+int endOfFile(FILE *file, char *filename)
+{
+    if (feof(file))
+    {
+        printf("ERROR: Bad Data (%s)\n", filename);
+        return 1;
+    }
+
+    return 0;
+}
+
+// checks if end of file has been reached
+// returns 1 if end of file has not been reached
+int notEndOfFile(FILE *file, char *filename)
+{
+    if (!feof(file))
+    {
+        printf("ERROR: Bad Data (%s)\n", filename);
+        return 1;
+    }
+
+    return 0;
+}
+
+/*      SPECIALISED FOR EBF REALTED FILES       */
 // check if pixel value is out of bounds
 // returns 1 if pixel value is out of bounds
 int badPixelValue(int pixel, char *filename)
@@ -115,9 +143,9 @@ int badPixelValue(int pixel, char *filename)
 
 // checks if length of array is the same as the width given in file
 // returns 1 if array size does not match the stated width from the file
-int wrongArraySize(ebfData *data, int arraySize, char *filename)
+int wrongArraySize(int width, int arraySize, char *filename)
 {
-    if (arraySize != data->width)
+    if (arraySize != width)
     {
         printf("ERROR: Bad Data (%s)\n", filename);
         return 1;
@@ -151,6 +179,24 @@ int tooManyLines(void *array, char *filename)
 
     return 0;
 }
+
+
+/*      SPECIALISED FOR BINARY RELATED FILES        */
+// checks if the correct number of bytes has been read
+// returns 1 if no bytes has been read to the array
+int badByteRead(int count, char *filename)
+{
+    if (!count)
+    {
+        printf("ERROR: Bad Data (%s)\n", filename);
+        return 1;
+    }
+
+    return 0;
+}
+
+
+
 
 /*      BAD OUTPUT     */
 // checks to see if the data is being outputted correctly

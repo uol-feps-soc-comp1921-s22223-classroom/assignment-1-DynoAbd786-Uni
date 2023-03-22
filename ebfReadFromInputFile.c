@@ -5,6 +5,7 @@
 
 #include "ebfStruct.h"
 #include "ebfErrorChecking.h"
+#include "conversionFunctions.h"
 #include "memoryManagement.h"
 #include "ebfReadFromInputFile.h"
 
@@ -26,14 +27,14 @@ int getFileData(ebfData *inputData, char* filename, FILE *inputFile)
     // and capture fscanfs return to ensure we got 2 values.
     int check = getDimensions(&inputData->height, &inputData->width, inputFile);
     // check if dimensions satisfy requirements
-    if (badDimensions(inputData, check, filename))
+    if (badDimensions(inputData->height, inputData->width, check, filename))
     { // check dimensions
         return BAD_DIM;
     } // check dimensions
 
     // set up data array to store pixel values later
     // checks for any error codes that may have been returned
-    check = setImageDataArray(inputData, inputFile);
+    check = setImageDataArray(inputData);
     if (check != 0)
     {
         return check;
@@ -83,9 +84,13 @@ int getDimensions(int *height, int *width, FILE *inputFile)
     return check;
 }
 
+
+/*      FOR EBF FILES       */
+
+
 // mallocs an array for the data to be stored in.
 // returns any error code that may arise during the malloc, 0 for no errors
-int setImageDataArray(ebfData *data, FILE *inputFile)
+int setImageDataArray(ebfData *data)
 {
     // caclulate total size and allocate memory for array
     data->numBytes = data->height * data->width;
@@ -118,6 +123,8 @@ int setImageDataArray(ebfData *data, FILE *inputFile)
 // works in line by line fashion, in case height and width of pixels doesnt match the specified parameters
 int getImageDataArray(ebfData *data, FILE *inputFile, char *filename)
 {
+
+    unsigned int *inputIntArray = NULL;
     // set up quantity for worst case scenario of integer line ups (2 digit ints plus space across the width, with newline char at the end)
     long Max_Char_Bytes = sizeof(char)*3*(data->width + 1);
     // malloc empty buffer to store 1 line of data into as type char *
@@ -134,17 +141,17 @@ int getImageDataArray(ebfData *data, FILE *inputFile, char *filename)
     if (noMoreLines(fgets(input, sizeof(input), inputFile), filename))
     {
         // ensure that allocated data is freed before exit.
-        free(input);      
+        freeEbfReadDataArrays(input, inputIntArray);
         return BAD_DATA;
     }
 
     // malloc an array of pointers to unsigned ints
     // used to store numbers when converted from char *input array
-    unsigned int *inputIntArray = (unsigned int *) malloc(sizeof(unsigned int) * (data->width + 1));
+    inputIntArray = (unsigned int *) malloc(sizeof(unsigned int) * (data->width + 1));
 
     if (badMalloc(inputIntArray))
     { // check malloc
-        free(input);    
+        freeEbfReadDataArrays(input, inputIntArray); 
         return BAD_MALLOC;
     } // check malloc
 
@@ -155,8 +162,7 @@ int getImageDataArray(ebfData *data, FILE *inputFile, char *filename)
         if (noMoreLines(fgets(input, Max_Char_Bytes, inputFile), filename))
         {
             // ensure that allocated data is freed before exit.
-            free(input);
-            free(inputIntArray);
+            freeEbfReadDataArrays(input, inputIntArray);
             return BAD_DATA;
         }
 
@@ -180,11 +186,10 @@ int getImageDataArray(ebfData *data, FILE *inputFile, char *filename)
         }        
 
         // BAD DATA CHECK: checks to see if the sizeOfIntArray matches the inputted width
-        if (wrongArraySize(data, sizeOfIntArray, filename))
+        if (wrongArraySize(data->width, sizeOfIntArray, filename))
         {
             // ensure that allocated data is freed before exit.
-            free(input);
-            free(inputIntArray);
+            freeEbfReadDataArrays(input, inputIntArray);
             return BAD_DATA;
         }
         
@@ -195,8 +200,7 @@ int getImageDataArray(ebfData *data, FILE *inputFile, char *filename)
             if (badPixelValue(inputIntArray[currentColumn], filename))
             {
                 // ensure that allocated data is freed before exit.
-                free(input);
-                free(inputIntArray);
+                freeEbfReadDataArrays(input, inputIntArray);
                 return BAD_DATA;
             }
 
@@ -205,19 +209,78 @@ int getImageDataArray(ebfData *data, FILE *inputFile, char *filename)
         }
     }
 
-    // validate there are no more rows of data to read from
-    if (tooManyLines(fgets(input, Max_Char_Bytes, inputFile), filename))
+    // check if end of file has been reached
+    if (notEndOfFile(inputFile, filename))
     {
-        // free all necessary data before exiting
-        free(input);
-        free(inputIntArray);
+        freeEbfReadDataArrays(input, inputIntArray);
         return BAD_DATA;
     }
 
     // free and dereference char *array and pointer to unsigned int array since the purpose of these has been fulfilled
-    free(input);
-    input = NULL;
-    free(inputIntArray);
-    inputIntArray = NULL;
+    freeEbfReadDataArrays(input, inputIntArray);
     return 0;
 }
+
+
+/*      FOR EBU FILES       */
+
+// mallocs a binary array for the data to be stored in.
+// returns any error code that may arise during the malloc, 0 for no errors
+int setBinaryImageDataArrayEbu(ebuData *data)
+{
+    // caclulate total size and allocate memory for array
+    data->numBytes = data->height * data->width;
+    data->imageData = (BYTE **) malloc(data->numBytes * sizeof(BYTE *));
+
+    // if malloc is unsuccessful, it will return a BAD MALLOC error code
+    if (badMalloc(data->imageData))
+    { // check malloc
+        return BAD_MALLOC;
+    } // check malloc
+
+    // data block malloc'd to set up 2D array for imageData
+    data->dataBlock = (BYTE *) malloc(data->numBytes * sizeof(BYTE));
+
+    // if malloc is unsucessful, it will return a null pointer
+    if (badMalloc(data->dataBlock))
+    { // check malloc
+        return BAD_MALLOC;
+    } // check malloc
+
+    // pointer arithmetic to set up 2D array 
+    for (int row = 0; row < data->height; row++)
+    {
+        data->imageData[row] = data->dataBlock + row * data->width;
+    }
+    return 0;
+}
+
+// gets image data from an ebu binary file
+int getBinaryImageDataArray(ebfData *data, FILE *inputFile, char *filename)
+{
+    // reading directly into the 1D array dataBlock, which should by definition also store to the 2D block
+    // keeping a track of count in case # of pixels in file doesnt match # of bytes stated in header of file 
+    for (int byteNumber = 0; byteNumber < data->numBytes; byteNumber++)
+    {
+        // checking if no bytes has been read (for low bad data)
+        if (badByteRead(fread(&data->dataBlock[byteNumber], sizeof(BYTE), 1, inputFile), filename))
+        {
+            return BAD_DATA;
+        }
+        // checking if pixel value is correct by converting to an int and passing it as an arguement
+        else if (badPixelValue(convertEbu2Ebf(data->dataBlock[byteNumber]), filename))
+        {
+            return BAD_DATA;
+        }
+    }
+    
+    // check if end of file has been reached
+    if (notEndOfFile(inputFile, filename))
+    {
+        return BAD_DATA;
+    }
+
+    return 0;
+}
+
+
