@@ -2,11 +2,11 @@
 
 int getFileData(ebfData *inputData, char *filename, FILE *inputFile);
 
-void getMagicNumber(FILE *inputFile, ebfData *data);
+void getMagicNumber(FILE *inputFile, unsigned char *data);
 
-int checkMagicNumberValue(ebfData *data, char *filename);
+int checkMagicNumberValue(unsigned char *magicNumber, char *filename);
 
-int getDimensions(ebfData *data, FILE *inputFile);
+int getDimensions(int *height, int *width, FILE *inputFile);
 
 int setImageDataArray(ebfData *data, FILE *inputFile);
 

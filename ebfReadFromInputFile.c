@@ -13,10 +13,10 @@
 int getFileData(ebfData *inputData, char* filename, FILE *inputFile)
 {   
     // set first 2 characters which should be magic number
-    getMagicNumber(inputFile, inputData);
+    getMagicNumber(inputFile, inputData->magicNumber);
 
     // checking if the magic number matches the known magic number value
-    if (checkMagicNumberValue(inputData, filename))
+    if (checkMagicNumberValue(inputData->magicNumber, filename))
     { // check magic number
         return BAD_MAGIC_NUMBER;
     } // check magic number
@@ -24,7 +24,7 @@ int getFileData(ebfData *inputData, char* filename, FILE *inputFile)
 
     // scan for the dimensions
     // and capture fscanfs return to ensure we got 2 values.
-    int check = getDimensions(inputData, inputFile);
+    int check = getDimensions(&inputData->height, &inputData->width, inputFile);
     // check if dimensions satisfy requirements
     if (badDimensions(inputData, check, filename))
     { // check dimensions
@@ -53,18 +53,18 @@ int getFileData(ebfData *inputData, char* filename, FILE *inputFile)
 
 
 // read in magic number from file are store it to the struct
-void getMagicNumber(FILE *inputFile, ebfData *data)
+void getMagicNumber(FILE *inputFile, unsigned char *magicNumber)
 {
-    data->magicNumber[0] = getc(inputFile);
-    data->magicNumber[1] = getc(inputFile);
+    magicNumber[0] = getc(inputFile);
+    magicNumber[1] = getc(inputFile);
 }
 
 
 // finds and returns error (1) if magic number values do not match
-int checkMagicNumberValue(ebfData *data, char *filename)
+int checkMagicNumberValue(unsigned char *magicNumber, char *filename)
 {
     // casting chars to unsigned short 
-    unsigned short *magicNumberValue = (unsigned short *) data->magicNumber;
+    unsigned short *magicNumberValue = (unsigned short *) magicNumber;
     // checking against the casted value due to endienness.
     if (badMagicNumber(magicNumberValue, filename))
     {
@@ -77,9 +77,9 @@ int checkMagicNumberValue(ebfData *data, char *filename)
 // read in dimensions and return number of values scanned
 // returns number of values read from file, or -1 for error
 /* NEEDS ERROR CHECKING PER LINE */
-int getDimensions(ebfData *data, FILE *inputFile)
+int getDimensions(int *height, int *width, FILE *inputFile)
 {
-    int check = fscanf(inputFile, "%d %d", &data->height, &data->width);
+    int check = fscanf(inputFile, "%d %d", height, width);
     return check;
 }
 
