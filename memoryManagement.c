@@ -63,6 +63,25 @@ void freeDataArray(ebfData *dataToCompare[])
     }
 }
 
+void freeEbfReadDataArrays(char *input, unsigned int *inputIntArray)
+{
+    // checks if input array has been malloc'd
+    if (input != NULL)
+    {
+        // free and dereference input to NULL to avoid hanging pointer
+        free(input);
+        input = NULL;
+    }
+
+    // checks if inputIntArray struct has been malloc'd
+    if (inputIntArray != NULL)
+    {
+        // free and dereference inputIntArray to NULL to avoid hanging pointer
+        free(inputIntArray);
+        inputIntArray = NULL;
+    }
+}
+
 
 // may be useful later, see ebfStruct
 // void freeData(void* data)

@@ -1,6 +1,10 @@
 {
     "files.associations": {
-        "conversionfunctions.h": "c"
+        "conversionfunctions.h": "c",
+        "hash_map": "c",
+        "bitset": "c",
+        "chrono": "c",
+        "algorithm": "c"
     },
     "makefile.launchConfigurations": [
         {

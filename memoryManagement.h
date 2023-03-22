@@ -10,3 +10,5 @@ ebuData *mallocEbu();
 void freeData(ebfData *data);
 
 void freeDataArray(ebfData *dataToCompare[]);
+
+void freeEbfReadDataArrays(char *input, unsigned int *inputIntArray);

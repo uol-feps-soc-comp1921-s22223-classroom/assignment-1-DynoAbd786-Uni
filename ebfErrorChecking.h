@@ -25,16 +25,22 @@ int badFile(FILE *file, char *filename);
 
 int badMagicNumber(unsigned short *magicNumberValue, char *filename);
 
-int badDimensions(ebfData *data, int checkValue, char *filename);
+int badDimensions(int height, int width, int checkValue, char *filename);
 
 int badMalloc(void *mallocData);
 
+int endOfFile(FILE *file, char *filename);
+
+int notEndOfFile(FILE *file, char *filename);
+
 int badPixelValue(int pixel, char *filename);
 
-int wrongArraySize(ebfData *data, int arraySize, char *filename);
+int wrongArraySize(int width, int arraySize, char *filename);
 
 int noMoreLines(void *array, char *filename);
 
 int tooManyLines(void *array, char *filename);
+
+int badByteRead(int count, char *filename);
 
 int badOutput(int check);
