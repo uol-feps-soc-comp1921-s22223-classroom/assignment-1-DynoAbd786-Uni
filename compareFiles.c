@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "ebfStruct.h"
 #include "compareFiles.h"
 
@@ -8,7 +10,7 @@
 int compareData(ebfData *data1, ebfData *data2)
 {
     // checking if dimensions are the same
-    if (comapareDimensions(data1, data2))
+    if (compareDimensions(data1->height, data2->height, data1->width, data2->width))
     {
         return 1;
     }
@@ -25,10 +27,10 @@ int compareData(ebfData *data1, ebfData *data2)
 
 // compares the dimensions agaisnt each other
 // return 1 if dimensions are different, 0 if same
-int comapareDimensions(ebfData *data1, ebfData *data2)
+int compareDimensions(int height1, int height2, int width1, int width2)
 {
     // checking if dimensions are different
-    if (data1->height != data2->height || data1->width != data2->width)
+    if (height1 != height2 || width1 != width2)
     {
         // return 1 if different
         return 1; 
@@ -56,4 +58,45 @@ int comparePixelValues(ebfData *data1, ebfData *data2)
     }
 
     return 0;
+}
+
+
+// compares binary data agaisnt each other to check for differences
+// returns 1 if data is different, 0 if same
+// function also does not need to compare magic number
+int compareBinaryData(ebuData *data1, ebuData *data2)
+{
+    // checking if dimensions are the same
+    if (compareDimensions(data1->height, data2->height, data1->width, data2->width))
+    {
+        return 1;
+    }
+    
+    // checking if pixel values are the same
+    if (compareBinaryPixelValues(data1->dataBlock, data2->dataBlock, data1->numBytes))
+    {
+        return 1;
+    }
+
+    // return 0 for files are the same
+    return 0;   
+}
+
+// compares binary pixel values agaisnt each other
+// returns 1 if the data is different, 0 if same
+int compareBinaryPixelValues(BYTE *dataBlock1, BYTE *dataBlock2, long numBytes)
+{
+    // looping through both 1D arrays
+    for (int byteNumber = 0; byteNumber < numBytes; byteNumber++)
+    {
+        // checking if the pixel values match
+        if ((int) dataBlock1[byteNumber] != (int) dataBlock2[byteNumber])
+        {
+            // return 1 if different
+            return 1;
+        }
+    }
+
+    // return 0 for files are the same
+    return 0;   
 }

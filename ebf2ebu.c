@@ -60,6 +60,7 @@ int main(int argc, char **argv)
 
     fclose(inputFile);
 
+
     /*      OUTPUTTING AS AN EBU FILE       */
 
     // get and open the output file in write mode
@@ -83,7 +84,9 @@ int main(int argc, char **argv)
         return errCode;
     }
 
-    // print final success message and return
+    // print final success message, free and return
     printf("CONVERTED\n");
+    freeEbfData(inputData);
+    fclose(outputFile);
     return SUCCESS;
 }
