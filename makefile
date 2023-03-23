@@ -9,9 +9,9 @@ CC     = gcc
 # -g enables the use of GDB
 CFLAGS = -std=c99 -Wall -Werror -g
 # this is your list of executables which you want to compile with all
-EXE = ebfEcho ebfComp ebf2ebu
+EXE = ebfEcho ebfComp ebf2ebu ebuEcho
 
-SRC = ebfEcho.c ebfComp.c ebf2ebu.c ebfErrorChecking.c ebfReadFromInputFile.c ebfWriteToOutputFile.c loadFiles.c memoryManagement.c compareFiles.c conversionFunctions.c
+SRC = ebfEcho.c ebfComp.c ebf2ebu.c ebuEcho.c ebfErrorChecking.c ebfReadFromInputFile.c ebfWriteToOutputFile.c loadFiles.c memoryManagement.c compareFiles.c conversionFunctions.c
 
 OBJ = $(SRCS:.c=.o)
 
@@ -72,4 +72,7 @@ ebf2ebu: ebf2ebu.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFil
 	$(CC) $(CCFLAGS) $^ -o $@
 
 conversionFunctions: conversionFunctions.o
+	$(CC) $(CCFLAGS) $^ -o $@
+
+ebuEcho: ebuEcho.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
 	$(CC) $(CCFLAGS) $^ -o $@

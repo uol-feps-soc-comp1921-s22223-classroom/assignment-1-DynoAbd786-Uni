@@ -10,7 +10,9 @@
 #define BAD_MALLOC 5
 #define BAD_DATA 6
 #define BAD_OUTPUT 7
-#define MAGIC_NUMBER 0x6265
+#define MAGIC_NUMBER_EBF 0x6265
+#define MAGIC_NUMBER_EBU 0x7565
+#define MAGIC_NUMBER_EBC 0
 #define MAX_DIMENSION 262144
 #define MIN_DIMENSION 1
 #define MIN_PIXEL_VALUE 0
@@ -23,7 +25,11 @@ int badArguements(int argc);
 
 int badFile(FILE *file, char *filename);
 
-int badMagicNumber(unsigned short *magicNumberValue, char *filename);
+int badMagicNumberEbf(unsigned short *magicNumberValue, char *filename);
+
+int badMagicNumberEbu(unsigned short *magicNumberValue, char *filename);
+
+int badMagicNumberEbc(unsigned short *magicNumberValue, char *filename);
 
 int badDimensions(int height, int width, int checkValue, char *filename);
 

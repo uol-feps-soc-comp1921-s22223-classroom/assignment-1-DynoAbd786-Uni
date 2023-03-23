@@ -16,8 +16,10 @@ int getFileData(ebfData *inputData, char* filename, FILE *inputFile)
     // set first 2 characters which should be magic number
     getMagicNumber(inputFile, inputData->magicNumber);
 
+
     // checking if the magic number matches the known magic number value
-    if (checkMagicNumberValue(inputData->magicNumber, filename))
+    // checking against the casted value due to endienness.
+    if (badMagicNumberEbf(getMagicNumberValue(inputData->magicNumber), filename))
     { // check magic number
         return BAD_MAGIC_NUMBER;
     } // check magic number
@@ -62,16 +64,11 @@ void getMagicNumber(FILE *inputFile, unsigned char *magicNumber)
 
 
 // finds and returns error (1) if magic number values do not match
-int checkMagicNumberValue(unsigned char *magicNumber, char *filename)
+unsigned short *getMagicNumberValue(unsigned char *magicNumber)
 {
     // casting chars to unsigned short 
     unsigned short *magicNumberValue = (unsigned short *) magicNumber;
-    // checking against the casted value due to endienness.
-    if (badMagicNumber(magicNumberValue, filename))
-    {
-        return 1;
-    }
-    return 0;
+    return magicNumberValue;   
 }
 
 
@@ -224,6 +221,48 @@ int getImageDataArray(ebfData *data, FILE *inputFile, char *filename)
 
 /*      FOR EBU FILES       */
 
+int getFileDataBinary(ebuData *inputData, char* filename, FILE *inputFile)
+{   
+    // set first 2 characters which should be magic number
+    getMagicNumber(inputFile, inputData->magicNumber);
+
+    // checking if the magic number matches the known magic number value
+    // checking against the casted value due to endienness.
+    if (badMagicNumberEbu(getMagicNumberValue(inputData->magicNumber), filename))
+    { // check magic number
+        return BAD_MAGIC_NUMBER;
+    } // check magic number
+
+
+    // scan for the dimensions
+    // and capture fscanfs return to ensure we got 2 values.
+    int check = getDimensions(&inputData->height, &inputData->width, inputFile);
+    // check if dimensions satisfy requirements
+    if (badDimensions(inputData->height, inputData->width, check, filename))
+    { // check dimensions
+        return BAD_DIM;
+    } // check dimensions
+
+    // set up data array to store pixel values later
+    // checks for any error codes that may have been returned
+    check = setBinaryImageDataArrayEbu(inputData);
+    if (check != 0)
+    {
+        return check;
+    }
+
+    // get image data from the file and store it to the struct 
+    // checks for any error codes that may have been returned
+    check = getBinaryImageDataArray(inputData, inputFile, filename);
+    if (check != 0)
+    {
+        return check;
+    }
+
+    // return 0 for success
+    return 0;
+}
+
 // mallocs a binary array for the data to be stored in.
 // returns any error code that may arise during the malloc, 0 for no errors
 int setBinaryImageDataArrayEbu(ebuData *data)
@@ -256,8 +295,11 @@ int setBinaryImageDataArrayEbu(ebuData *data)
 }
 
 // gets image data from an ebu binary file
-int getBinaryImageDataArray(ebfData *data, FILE *inputFile, char *filename)
+int getBinaryImageDataArray(ebuData *data, FILE *inputFile, char *filename)
 {
+    // cycle to next line ("grabs" new line char)
+    fgetc(inputFile);
+    
     // reading directly into the 1D array dataBlock, which should by definition also store to the 2D block
     // keeping a track of count in case # of pixels in file doesnt match # of bytes stated in header of file 
     for (int byteNumber = 0; byteNumber < data->numBytes; byteNumber++)
@@ -274,6 +316,11 @@ int getBinaryImageDataArray(ebfData *data, FILE *inputFile, char *filename)
         }
     }
     
+    // extra bit of code to get rid of the null char (i think its a null)
+    BYTE tmp;
+    fread(&tmp, sizeof(BYTE), 2, inputFile);
+    
+
     // check if end of file has been reached
     if (notEndOfFile(inputFile, filename))
     {

@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     // check file opened successfully
     if (badFile(inputFile, inputFilename))
     { // check file pointer
-        freeData(inputData);
+        freeEbfData(inputData);
         return BAD_FILE;
     } // check file pointer
 
@@ -53,7 +53,7 @@ int main(int argc, char **argv)
     if (errCode != 0)
     {
         // exit with the error code and free any data used in the program
-        freeData(inputData);
+        freeEbfData(inputData);
         fclose(inputFile);
         return errCode;
     }
@@ -78,7 +78,7 @@ int main(int argc, char **argv)
     if (errCode != 0)
     {
         // exit with the error code and free any data used in the program
-        freeData(inputData);
+        freeEbfData(inputData);
         fclose(inputFile);
         return errCode;
     }

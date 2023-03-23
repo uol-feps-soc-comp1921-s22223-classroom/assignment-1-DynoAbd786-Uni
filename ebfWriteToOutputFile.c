@@ -212,19 +212,7 @@ int outputFileDataBinary(ebuData *data, char *filename, FILE *outputFile)
 // returns error code if output has failed, 0 if successful
 int outputImageDataBinary(BYTE *dataBlock, long numBytes, FILE *outputFile)
 {
-    // // iterate though the array and print out pixel values
-    // for (int currentRow = 0; currentRow < height; currentRow++)
-    // { // writing out row
-    //     for (int currentColumn = 0; currentColumn < width; currentColumn++)
-    //     { // writing out column
-    //         // run and check if the output was successful
-    //         if (badOutput((int) fwrite(&imageData[currentRow][currentColumn], sizeof(BYTE), 1, outputFile)))
-    //         { // check write
-    //             return BAD_OUTPUT;
-    //         } // check write
-    //     }
-    // }
-
+    // write the entire dataBlock to the file
     fwrite(dataBlock, numBytes, 1, outputFile);
 
     return 0;

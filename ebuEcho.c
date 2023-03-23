@@ -44,16 +44,16 @@ int main(int argc, char **argv)
     // check file opened successfully
     if (badFile(inputFile, inputFilename))
     { // check file pointer
-        freeData(inputData);
+        freeEbuData(inputData);
         return BAD_FILE;
     } // check file pointer
 
     // checking if any error codes arise when getting data (0 means success)
-    int errCode = getFileData(inputData, inputFilename, inputFile);
+    int errCode = getFileDataBinary(inputData, inputFilename, inputFile);
     if (errCode != 0)
     {
         // exit with the error code and free any data used in the program
-        freeData(inputData);
+        freeEbuData(inputData);
         fclose(inputFile);
         return errCode;
     }
@@ -65,20 +65,21 @@ int main(int argc, char **argv)
 
     // get and open the output file in write mode
     char *outputFilename = argv[2];
-    FILE *outputFile = loadOutputFile(outputFilename);
+    FILE *outputFile = loadOutputFileBinary(outputFilename);
     // validate that the file has been opened correctly
     if (badFile(outputFile, outputFilename))
     { // validate output file
         return BAD_FILE;
     } // validate output file
 
+    
     // output to file
-    errCode = outputFileData(inputData, outputFilename, outputFile);
+    errCode = outputFileDataBinary(inputData, outputFilename, outputFile);
     // checking for any error codes
     if (errCode != 0)
     {
         // exit with the error code and free any data used in the program
-        freeData(inputData);
+        freeEbuData(inputData);
         fclose(inputFile);
         return errCode;
     }

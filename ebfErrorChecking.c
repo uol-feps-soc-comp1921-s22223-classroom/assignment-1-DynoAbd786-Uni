@@ -58,9 +58,31 @@ int badFile(FILE *file, char *filename)
 /*      BAD MAGIC NUMBER        */
 // checking against the casted value due to endienness
 // returns 1 if magic number doesnt match known value
-int badMagicNumber(unsigned short *magicNumberValue, char *filename)
+int badMagicNumberEbf(unsigned short *magicNumberValue, char *filename)
 {
-    if (*magicNumberValue != MAGIC_NUMBER)
+    if (*magicNumberValue != MAGIC_NUMBER_EBF)
+    { // check magic number
+        printf("ERROR: Bad Magic Number (%s)\n", filename);
+        return 1;
+    } // check magic number
+
+    return 0;
+}
+
+int badMagicNumberEbu(unsigned short *magicNumberValue, char *filename)
+{
+    if (*magicNumberValue != MAGIC_NUMBER_EBU)
+    { // check magic number
+        printf("ERROR: Bad Magic Number (%s)\n", filename);
+        return 1;
+    } // check magic number
+
+    return 0;
+}
+
+int badMagicNumberEbc(unsigned short *magicNumberValue, char *filename)
+{
+    if (*magicNumberValue != MAGIC_NUMBER_EBC)
     { // check magic number
         printf("ERROR: Bad Magic Number (%s)\n", filename);
         return 1;
