@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     /*      TAKING INPUT FROM FILE      */
 
     // malloc a struct of type ebfData to store data to
-    ebfData *inputData = mallocEbf();
+    ebuData *inputData = mallocEbu();
     // checking if struct has been malloc'd
     if (badMalloc(inputData))
     {
@@ -40,20 +40,20 @@ int main(int argc, char **argv)
 
     // get and open the input file in read mode
     char *inputFilename = argv[1];
-    FILE *inputFile = loadInputFile(inputFilename);
+    FILE *inputFile = loadInputFileBinary(inputFilename);
     // check file opened successfully
     if (badFile(inputFile, inputFilename))
     { // check file pointer
-        freeEbfData(inputData);
+        freeEbuData(inputData);
         return BAD_FILE;
     } // check file pointer
 
     // checking if any error codes arise when getting data (0 means success)
-    int errCode = getFileData(inputData, inputFilename, inputFile);
+    int errCode = getFileDataBinary(inputData, inputFilename, inputFile);
     if (errCode != 0)
     {
         // exit with the error code and free any data used in the program
-        freeEbfData(inputData);
+        freeEbuData(inputData);
         fclose(inputFile);
         return errCode;
     }
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
     fclose(inputFile);
 
 
-    /*      WRITING TO FILE     */
+    /*      OUTPUTTING AS AN EBF FILE       */
 
     // get and open the output file in write mode
     char *outputFilename = argv[2];
@@ -73,19 +73,19 @@ int main(int argc, char **argv)
     } // validate output file
 
     // output to file
-    errCode = outputFileData(inputData, outputFilename, outputFile);
+    errCode = outputFileDataEbuDirectEbf(inputData, outputFilename, outputFile);
     // checking for any error codes
     if (errCode != 0)
     {
         // exit with the error code and free any data used in the program
-        freeEbfData(inputData);
+        freeEbuData(inputData);
         fclose(outputFile);
         return errCode;
     }
 
     // print final success message, free and return
-    printf("ECHOED\n");
-    freeEbfData(inputData);
+    printf("CONVERTED\n");
+    freeEbuData(inputData);
     fclose(outputFile);
     return SUCCESS;
-} // main()
+}

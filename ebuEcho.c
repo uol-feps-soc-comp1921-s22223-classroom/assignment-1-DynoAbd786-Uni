@@ -80,11 +80,13 @@ int main(int argc, char **argv)
     {
         // exit with the error code and free any data used in the program
         freeEbuData(inputData);
-        fclose(inputFile);
+        fclose(outputFile);
         return errCode;
     }
 
-    // print final success message and return
+    // print final success message, free and return
     printf("ECHOED\n");
+    freeEbuData(inputData);
+    fclose(outputFile);
     return SUCCESS;
 } // main()
