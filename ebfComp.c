@@ -42,7 +42,7 @@ int main(int argc, char **argv)
         // checking if struct has been malloc'd
         if (badMalloc(dataToCompare[fileNumber]))
         {
-            freeDataArray(dataToCompare);
+            freeEbfDataArray(dataToCompare);
             return BAD_MALLOC;
         }
 
@@ -52,7 +52,7 @@ int main(int argc, char **argv)
         // check file opened successfully
         if (badFile(inputFile, inputFilename))
         { // check file pointer
-            freeDataArray(dataToCompare);
+            freeEbfDataArray(dataToCompare);
             return BAD_FILE;
         } // check file pointer
 
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
         if (errCode != 0)
         {
             // exit with the error code and free any data used in the program
-            freeDataArray(dataToCompare);
+            freeEbfDataArray(dataToCompare);
             fclose(inputFile);
             return errCode;
         }
@@ -83,6 +83,6 @@ int main(int argc, char **argv)
     }
 
     // free the data array and close the progran with return value SUCCESS.
-    freeDataArray(dataToCompare);
+    freeEbfDataArray(dataToCompare);
     return SUCCESS;
 } // main()
