@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     /*      TAKING INPUT FROM FILE      */
 
     // malloc a struct of type ebfData to store data to
-    ebcData *inputData = mallocEbc();
+    ebuData *inputData = mallocEbu();
     // checking if struct has been malloc'd
     if (badMalloc(inputData))
     {
@@ -44,16 +44,16 @@ int main(int argc, char **argv)
     // check file opened successfully
     if (badFile(inputFile, inputFilename))
     { // check file pointer
-        freeEbcData(inputData);
+        freeEbuData(inputData);
         return BAD_FILE;
     } // check file pointer
 
     // checking if any error codes arise when getting data (0 means success)
-    int errCode = getFileDataCompressedBinary(inputData, inputFilename, inputFile);
+    int errCode = getFileDataBinary(inputData, inputFilename, inputFile);
     if (errCode != 0)
     {
         // exit with the error code and free any data used in the program
-        freeEbcuData(inputData);
+        freeEbuData(inputData);
         fclose(inputFile);
         return errCode;
     }
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
     fclose(inputFile);
 
 
-    /*      WRITING TO EBC FILE     */
+    /*      OUTPUTTING AS AN EBC FILE     */
 
     // get and open the output file in write mode
     char *outputFilename = argv[2];
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
 
     
     // output to file
-    errCode = outputFileDataBinary(inputData, outputFilename, outputFile);
+    errCode = outputFileDataEbuDirectEbc(inputData, outputFilename, outputFile);
     // checking for any error codes
     if (errCode != 0)
     {
@@ -85,8 +85,8 @@ int main(int argc, char **argv)
     }
 
     // print final success message, free and return
-    printf("ECHOED\n");
+    printf("CONVERTED\n");
     freeEbuData(inputData);
     fclose(outputFile);
     return SUCCESS;
-} // main()
+}

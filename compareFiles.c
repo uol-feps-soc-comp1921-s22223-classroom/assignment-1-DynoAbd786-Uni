@@ -82,6 +82,8 @@ int compareBinaryData(ebuData *data1, ebuData *data2)
     return 0;   
 }
 
+
+// TEST IF INT CAST IS REQUIRED
 // compares binary pixel values agaisnt each other
 // returns 1 if the data is different, 0 if same
 int compareBinaryPixelValues(BYTE *dataBlock1, BYTE *dataBlock2, long numBytes)
