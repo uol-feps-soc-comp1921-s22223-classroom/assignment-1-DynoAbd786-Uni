@@ -19,11 +19,19 @@ int outputFileDataEbuDirectEbf(ebuData *data, char *filename, FILE *outputFile);
 int outputImageDataEbuDirectEbf(BYTE **imageData, int height, int width, FILE *outputFile);
 
 
-// for ebu to ebu/ebc to ebc/ebu to ebc/ebc to ebu outputs
+// for ebu to ebu/ebc to ebc outputs
 // essentially anything that works to output binary to binary
 int outputFileDataBinary(ebuData *data, char *filename, FILE *outputFile);
 
 int outputImageDataBinary(BYTE *dataBlock, long numBytes, FILE *outputFile);
+
+
+// for ebu to ebc outputs
+int outputFileDataEbuDirectEbc(ebuData *data, char *filename, FILE *outputFile);
+
+int outputImageDataEbuDirectEbc(ebuData *data, char *filename, FILE *outputFile);
+
+
 
 /*      NEEDS SPECIALISED FUNCTIONS TO WRITE EBC FILES      */
 // may be possible to write the entire dataBlock which is of guaranteed size numBytes

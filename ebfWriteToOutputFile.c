@@ -146,7 +146,8 @@ int outputFileDataEbuDirectEbf(ebuData *data, char *filename, FILE *outputFile)
     return 0;
 }
 
-
+// outputs image data from binary format to readable format
+// returns error code if output has failed, 0 if successful
 int outputImageDataEbuDirectEbf(BYTE **imageData, int height, int width, FILE *outputFile)
 {
     // iterate though the array and print out pixel values
@@ -213,7 +214,59 @@ int outputFileDataBinary(ebuData *data, char *filename, FILE *outputFile)
 int outputImageDataBinary(BYTE *dataBlock, long numBytes, FILE *outputFile)
 {
     // write the entire dataBlock to the file
-    fwrite(dataBlock, numBytes, 1, outputFile);
+    if (badOutput(fwrite(dataBlock, numBytes, 1, outputFile)))
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
+
+// function takes all data for ebu file and outputs it to ebc file
+// returns respective error codes if failed, 0 if otherwise
+int outputFileDataEbuDirectEbc(ebuData *data, char *filename, FILE *outputFile)
+{
+    // define the header that needs to be outputted to the file
+    unsigned char *header = (unsigned char *) "ec";
+    // output header to file and validate for success (0 means success)
+    if (outputHeader(header, data->height, data->width, outputFile) != 0)
+    {
+        return BAD_OUTPUT;
+    }
+    // output image data to file and validate for success (0 means success)
+    int errCode = outputImageDataEbuDirectEbc(data, filename, outputFile);
+    if (errCode != 0)
+    {
+        return errCode;
+    }
+
+    return 0;
+}
+
+// outputs image data from binary format to compressed binary format
+// returns error code if output has failed, 0 if successful
+int outputImageDataEbuDirectEbc(ebuData *data, char *filename, FILE *outputFile)
+{
+    // calculate size and allocate memory for an array that will store the compressed binary format once converted
+    int sizeOfCompressedBinaryArray = sizeof(BYTE) * ((data->numBytes / 8) * 5);
+    BYTE *compressedBinaryArray = malloc(sizeOfCompressedBinaryArray);
+    if (badMalloc(compressedBinaryArray))
+    {
+        return BAD_MALLOC;
+    }
+
+    // convert uncompressed binary format to compressed binary
+    compressedBinaryArray = convertEbu2Ebc(data->dataBlock, compressedBinaryArray, data->numBytes);
+
+    // write the entire dataBlock to the file
+    if (badOutput(fwrite(compressedBinaryArray, sizeOfCompressedBinaryArray, 1, outputFile)))
+    {
+        return BAD_OUTPUT;
+    }
+
+    // free malloc'd compressed binary array
+    free(compressedBinaryArray);
 
     return 0;
 }

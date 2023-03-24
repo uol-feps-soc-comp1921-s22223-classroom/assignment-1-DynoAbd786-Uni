@@ -88,7 +88,8 @@ run_test ()
 
 # you can remove or comment out any executables you don't want to test
 # full list of executables: ebf2ebu ebuEcho ebuComp ebu2ebf
-EXES=(ebfEcho ebfComp ebf2ebu ebuEcho ebuComp ebu2ebf)
+# ebfEcho ebfComp ebf2ebu ebuEcho ebuComp ebu2ebf
+EXES=(ebu2ebc)
 
 # run all of the tests below for all executables given in 'EXES'
 # inside this loop, the executable being run can be referred to by 'testExecutable'
@@ -105,6 +106,11 @@ do
     then
         file_ext=".ebu"
         path="tests/data/ebu_data/"
+    fi
+    if [[ ${testExecutable::3} == "ebc" ]]
+    then
+        file_ext=".ebc"
+        path="tests/data/ebc_data/"
     fi
 
     echo "-------------- TESTING $testExecutable --------------"
@@ -326,6 +332,6 @@ echo "--------------------------------------------------------------------------
 # and any object files are removed.
 
 # remove the files we created during the tests
-rm tmp null
+# rm tmp null
 # and run make clean to remove object files
 make clean
