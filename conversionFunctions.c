@@ -11,10 +11,20 @@ BYTE convertEbf2Ebu(unsigned int pixelValue)
 }
 
 // function coverts 1 pixel value from type ebuData file to readable numeric format.
-// does a bitwise calculation that takes the 8 least significant bits from the binary int, plus the extra 3 bytes to make an unsigned int
-// error checking unnecessary since pixel values have already been checked to be within limits
 unsigned int convertEbu2Ebf(BYTE pixelValueBinary)
 {
     unsigned int pixelValue = (unsigned int) pixelValueBinary;
     return pixelValue;
+}
+
+// function converts an array of compressed binary pixels to uncompressed binary format 
+BYTE *convertEbc2Ebu(BYTE *compressedPixelValues);
+{
+    for (int byteNumber = 0; byteNumber < )
+}
+
+// function converts an array of uncompressed binary pixels to compressed binary format 
+BYTE *convertEbu2Ebc(BYTE *uncompressedPixelValues);
+{
+    
 }

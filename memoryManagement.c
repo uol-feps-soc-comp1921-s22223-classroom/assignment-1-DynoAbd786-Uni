@@ -135,3 +135,66 @@ void freeEbuDataArray(ebuData *dataToCompare[])
 
 
 
+
+
+/*      EBC DATA MEMORY RELATED FUNCTIONS      */
+
+// mallocs an uninitialised struct of type ebuData to store file information to
+ebcData *mallocEbc()
+{
+    ebcData *data = (ebcData *) malloc(sizeof(ebcData));
+    return data;
+}
+
+// frees 1 data entry from the type ebcData
+void freeEbcData(ebcData *data)
+{
+    // checks if imageData has been malloc'd
+    if (data->imageData != NULL)
+    {
+        // free and dereference imageData to NULL to avoid hanging pointer
+        free(data->imageData);
+        data->imageData = NULL;
+    }
+
+    // checks if dataBlockUncompressed has been malloc'd
+    if (data->dataBlockUncompressed != NULL)
+    {
+        // free and dereference dataBlock to NULL to avoid hanging pointer
+        free(data->dataBlockUncompressed);
+        data->dataBlockUncompressed = NULL;
+    }
+
+    // checks if dataBlockCompressed has been malloc'd
+    if (data->dataBlockCompressed != NULL)
+    {
+        // free and dereference dataBlock to NULL to avoid hanging pointer
+        free(data->dataBlockCompressed);
+        data->dataBlockCompressed = NULL;
+    }
+
+    // checks if data struct has been malloc'd
+    if (data != NULL)
+    {
+        // free and dereference data struct to NULL to avoid hanging pointer
+        free(data);
+        data = NULL;
+    }
+}
+
+// frees an array of structs (for comp files related to ebc files)
+void freeEbcDataArray(ebcData *dataToCompare[])
+{
+    // for the 2 structs in the file storing data 
+    for (int fileNumber = 0; fileNumber < MAX_FILE_COMPARISON; fileNumber++)
+    {
+        // check if the struct at position fileNumber has some data. if so, free the struct
+        if (dataToCompare[fileNumber] != NULL)
+        {
+            freeEbcData(dataToCompare[fileNumber]);
+        }
+    }
+}
+
+
+

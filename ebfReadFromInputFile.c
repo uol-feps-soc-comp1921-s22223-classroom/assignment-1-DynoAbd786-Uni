@@ -9,7 +9,7 @@
 #include "memoryManagement.h"
 #include "ebfReadFromInputFile.h"
 
-// executes a series of funcions to gather and check all data from a file
+// executes a series of funcions to gather and check all data from an ebf file
 // returns respected error code to the error that may have occured in the file, 0 if successful
 int getFileData(ebfData *inputData, char* filename, FILE *inputFile)
 {   
@@ -221,6 +221,8 @@ int getImageDataArray(ebfData *data, FILE *inputFile, char *filename)
 
 /*      FOR EBU FILES       */
 
+// executes a series of funcions to gather and check all data from an ebu file
+// returns respected error code to the error that may have occured in the file, 0 if successful
 int getFileDataBinary(ebuData *inputData, char* filename, FILE *inputFile)
 {   
     // set first 2 characters which should be magic number
@@ -327,6 +329,98 @@ int getBinaryImageDataArray(ebuData *data, FILE *inputFile, char *filename)
         return BAD_DATA;
     }
 
+    return 0;
+}
+
+
+
+
+/*      FOR EBC FILES       */
+
+// executes a series of funcions to gather and check all data from an ebu file
+// returns respected error code to the error that may have occured in the file, 0 if successful
+int getFileDataCompressedBinary(ebcData *inputData, char* filename, FILE *inputFile)
+{   
+    // set first 2 characters which should be magic number
+    getMagicNumber(inputFile, inputData->magicNumber);
+
+    // checking if the magic number matches the known magic number value
+    // checking against the casted value due to endienness.
+    if (badMagicNumberEbc(getMagicNumberValue(inputData->magicNumber), filename))
+    { // check magic number
+        return BAD_MAGIC_NUMBER;
+    } // check magic number
+
+
+    // scan for the dimensions
+    // and capture fscanfs return to ensure we got 2 values.
+    int check = getDimensions(&inputData->height, &inputData->width, inputFile);
+    // check if dimensions satisfy requirements
+    if (badDimensions(inputData->height, inputData->width, check, filename))
+    { // check dimensions
+        return BAD_DIM;
+    } // check dimensions
+
+    // set up data array to store pixel values later
+    // checks for any error codes that may have been returned
+    check = setCompressedBinaryImageDataArrayEbc(inputData);
+    if (check != 0)
+    {
+        return check;
+    }
+
+    // get image data from the file and store it to the struct 
+    // checks for any error codes that may have been returned
+    // check = getBinaryImageDataArray(inputData, inputFile, filename);
+    // if (check != 0)
+    // {
+    //     return check;
+    // }
+
+    // return 0 for success
+    return 0;
+}
+
+// mallocs a binary array for the data to be stored in.
+// returns any error code that may arise during the malloc, 0 for no errors
+int setCompressedBinaryImageDataArrayEbc(ebcData *data)
+{
+    // caclulate total size and allocate memory for array
+    data->numBytesCompressed = ((data->height * data->width) * (3 / 5)) + 1;
+    data->numBytesUncompressed = data->height * data->width;
+
+    // allocate memory for imageData
+    data->imageData = (BYTE **) malloc(data->numBytesUncompressed * sizeof(BYTE *));
+
+    // if malloc is unsuccessful, it will return a BAD MALLOC error code
+    if (badMalloc(data->imageData))
+    { // check malloc
+        return BAD_MALLOC;
+    } // check malloc
+
+    // uncompressed data block malloc'd to set up 2D array for imageData
+    data->dataBlockUncompressed = (BYTE *) malloc(data->numBytesUncompressed * sizeof(BYTE));
+
+    // if malloc is unsucessful, it will return a null pointer
+    if (badMalloc(data->dataBlockUncompressed))
+    { // check malloc
+        return BAD_MALLOC;
+    } // check malloc
+
+    // compressed data block malloc'd to store and convert compressed imageData
+    data->dataBlockCompressed = (BYTE *) malloc(data->numBytesCompressed * sizeof(BYTE));
+
+    // if malloc is unsucessful, it will return a null pointer
+    if (badMalloc(data->dataBlockCompressed))
+    { // check malloc
+        return BAD_MALLOC;
+    } // check malloc
+
+    // pointer arithmetic to set up 2D array 
+    for (int row = 0; row < data->height; row++)
+    {
+        data->imageData[row] = data->dataBlockUncompressed + row * data->width;
+    }
     return 0;
 }
 

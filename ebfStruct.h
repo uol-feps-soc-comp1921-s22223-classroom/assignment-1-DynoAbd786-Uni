@@ -56,7 +56,7 @@ typedef struct
 } 
 ebfData;
 
-
+// struct for storing data from an ebu file
 typedef struct
 {
     unsigned char magicNumber[2]; // the 2nd char can be used for free identifier (SWITCH CASE)
@@ -66,6 +66,19 @@ typedef struct
     BYTE *dataBlock;
 }
 ebuData;
+
+// struct for storing data from an ebc file
+typedef struct
+{
+    unsigned char magicNumber[2]; // the 2nd char can be used for free identifier (SWITCH CASE)
+    int width, height;
+    long numBytesUncompressed;
+    long numBytesCompressed;
+    BYTE **imageData;
+    BYTE *dataBlockCompressed;
+    BYTE *dataBlockUncompressed;
+}
+ebcData;
 
 
 
