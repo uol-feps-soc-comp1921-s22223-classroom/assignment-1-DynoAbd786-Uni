@@ -61,7 +61,7 @@ int main(int argc, char **argv)
     fclose(inputFile);
 
 
-    /*      WRITING TO EBC FILE     */
+    /*      WRITING TO FILE     */
 
     // get and open the output file in write mode
     char *outputFilename = argv[2];

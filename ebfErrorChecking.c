@@ -203,7 +203,7 @@ int tooManyLines(void *array, char *filename)
 }
 
 
-/*      SPECIALISED FOR BINARY RELATED FILES        */
+/*      SPECIALISED FOR UNCOMPRESSED BINARY RELATED FILES        */
 // checks if the correct number of bytes has been read
 // returns 1 if no bytes has been read to the array
 int badByteRead(int count, char *filename)
@@ -211,6 +211,18 @@ int badByteRead(int count, char *filename)
     if (!count)
     {
         printf("ERROR: Bad Data (%s)\n", filename);
+        return 1;
+    }
+
+    return 0;
+}
+
+/*      SPECIALISED FOR COMPRESSED BINARY RELATED FILES        */
+// compares the amount of decompressed bytes retuned by the conversion algorithm agaisnt the expected numBytes
+int badNumBytes(int count, int numBytesUncompressed)
+{
+    if (count != numBytesUncompressed)
+    {
         return 1;
     }
 
