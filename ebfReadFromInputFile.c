@@ -371,11 +371,11 @@ int getFileDataCompressedBinary(ebcData *inputData, char* filename, FILE *inputF
 
     // get image data from the file and store it to the struct 
     // checks for any error codes that may have been returned
-    // check = getBinaryImageDataArray(inputData, inputFile, filename);
-    // if (check != 0)
-    // {
-    //     return check;
-    // }
+    check = getCompressedBinaryImageDataArray(inputData, inputFile, filename);
+    if (check != 0)
+    {
+        return check;
+    }
 
     // return 0 for success
     return 0;
@@ -386,8 +386,18 @@ int getFileDataCompressedBinary(ebcData *inputData, char* filename, FILE *inputF
 int setCompressedBinaryImageDataArrayEbc(ebcData *data)
 {
     // caclulate total size and allocate memory for array
-    data->numBytesCompressed = ((data->height * data->width) * (3 / 5)) + 1;
     data->numBytesUncompressed = data->height * data->width;
+
+    // extra bit of logic to account for any overhead in the file
+    // if there is a remainder from numBytesUncompressed, there is an extra byte that is storing information that needs to be collected
+    if ((data->numBytesUncompressed % (8.0 / 5.0) != 0.0)
+    {
+        data->numBytesCompressed = ((data->height * data->width) * (8 / 5)) + 1;
+    }
+    else
+    {
+        data->numBytesCompressed = ((data->numBytesUncompressed) * (8 / 5));
+    }
 
     // allocate memory for imageData
     data->imageData = (BYTE **) malloc(data->numBytesUncompressed * sizeof(BYTE *));
@@ -421,6 +431,59 @@ int setCompressedBinaryImageDataArrayEbc(ebcData *data)
     {
         data->imageData[row] = data->dataBlockUncompressed + row * data->width;
     }
+    return 0;
+}
+
+// gets image data from an ebc compressed binary file
+int getCompressedBinaryImageDataArray(inputData, inputFile, filename);
+{
+    // cycle to next line ("grabs" new line char)
+    fgetc(inputFile);
+    
+    // reading directly into the 1D array dataBlock, which should by definition also store to the 2D block
+    // keeping a track of count in case # of pixels in file doesnt match # of bytes stated in header of file 
+
+    // read in all the compressed pixel data
+    fread(data->dataBlockCompressed, sizeof(BYTE), data->numBytesCompressed, inputFile);
+
+    // decompress data to check individual pixel value 
+    int convertEbc2Ebu(inputData);
+
+    for (int byteNumber = 0; byteNumber < data->numBytesUncompressed; byteNumber++)
+    {
+        // checking if pixel value is correct by converting to an int and passing it as an arguement
+        if (badPixelValue(convertEbu2Ebf(data->dataBlockUncompressed[byteNumber]), filename))
+        {
+            return BAD_DATA;
+        }
+    }
+
+
+    for (int byteNumber = 0; byteNumber < data->numBytesCompressed; byteNumber++)
+    {
+        // checking if no bytes has been read (for low bad data)
+        if (badByteRead(fread(&data->dataBlock[byteNumber], sizeof(BYTE), 1, inputFile), filename))
+        {
+            return BAD_DATA;
+        }
+        // checking if pixel value is correct by converting to an int and passing it as an arguement
+        else if (badPixelValue(convertEbu2Ebf(data->dataBlock[byteNumber]), filename))
+        {
+            return BAD_DATA;
+        }
+    }
+    
+    // extra bit of code to get rid of the null char (i think its a null)
+    BYTE tmp;
+    fread(&tmp, sizeof(BYTE), 2, inputFile);
+    
+
+    // check if end of file has been reached
+    if (notEndOfFile(inputFile, filename))
+    {
+        return BAD_DATA;
+    }
+
     return 0;
 }
 

@@ -4,7 +4,8 @@
         "hash_map": "c",
         "bitset": "c",
         "chrono": "c",
-        "algorithm": "c"
+        "algorithm": "c",
+        "functional": "c"
     },
     "makefile.launchConfigurations": [
         {

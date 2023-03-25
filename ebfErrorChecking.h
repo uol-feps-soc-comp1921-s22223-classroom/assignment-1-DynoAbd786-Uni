@@ -49,4 +49,6 @@ int tooManyLines(void *array, char *filename);
 
 int badByteRead(int count, char *filename);
 
+int badNumBytes(int count, int numBytesUncompressed);
+
 int badOutput(int check);
