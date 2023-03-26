@@ -11,11 +11,11 @@ CFLAGS = -std=c99 -Wall -Werror -g -lm
 # this is your list of executables which you want to compile with all
 EXE = ebfEcho ebfComp ebf2ebu ebuEcho ebuComp ebu2ebf ebu2ebc ebcEcho ebcComp ebc2ebu
 
-SRC = ebfEcho.c ebfComp.c ebf2ebu.c ebuEcho.c ebuComp.c ebu2ebf.c ebu2ebc.c ebcEcho.c ebcComp.c ebc2ebu.c ebfErrorChecking.c ebfReadFromInputFile.c ebfWriteToOutputFile.c loadFiles.c memoryManagement.c compareFiles.c conversionFunctions.c
+SRC = ebfEcho.c ebfComp.c ebf2ebu.c ebuEcho.c ebuComp.c ebu2ebf.c ebu2ebc.c ebcEcho.c ebcComp.c ebc2ebu.c errorChecking.c readFromInputFile.c writeToOutputFile.c loadFiles.c memoryManagement.c compareFiles.c conversionFunctions.c
 
 OBJ = $(SRCS:.c=.o)
 
-dependencies = ebfStruct.h ebfErrorChecking.h conversionFunctions.h ebfReadFromInputFile.h ebfWriteToOutputFile.h loadFiles.h memoryManagement.h compareFiles.h math.h
+dependencies = fileStructs.h errorChecking.h conversionFunctions.h readFromInputFile.h writeToOutputFile.h loadFiles.h memoryManagement.h compareFiles.h math.h
 
 
 # we put 'all' as the first command as this will be run if you just enter 'make'
@@ -42,16 +42,16 @@ clean:
 
 
 
-ebfEcho: ebfEcho.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o 
+ebfEcho: ebfEcho.o errorChecking.o readFromInputFile.o writeToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o 
 	$(CC) $(CFLAGS) $^ -o $@
 
-ebfErrorChecking: ebfErrorChecking.o 
+errorChecking: errorChecking.o 
 	$(CC) $(CFLAGS) $^ -o $@
 
-ebfWriteToOutputFile: ebfWriteToOutputFile.o memoryManagement.o conversionFunctions.o ebfErrorChecking.o
+writeToOutputFile: writeToOutputFile.o memoryManagement.o conversionFunctions.o errorChecking.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-ebfReadFromInputFile: ebfReadFromInputFile.o memoryManagement.o conversionFunctions.o
+readFromInputFile: readFromInputFile.o memoryManagement.o conversionFunctions.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 loadFiles: loadFiles.o
@@ -60,35 +60,35 @@ loadFiles: loadFiles.o
 memoryManagement: memoryManagement.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-ebfComp: ebfComp.o memoryManagement.o loadFiles.o ebfErrorChecking.o ebfReadFromInputFile.o compareFiles.o conversionFunctions.o
+ebfComp: ebfComp.o memoryManagement.o loadFiles.o errorChecking.o readFromInputFile.o compareFiles.o conversionFunctions.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 compareFiles: compareFiles.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-ebf2ebu: ebf2ebu.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
+ebf2ebu: ebf2ebu.o errorChecking.o readFromInputFile.o writeToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 conversionFunctions: conversionFunctions.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-ebuEcho: ebuEcho.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
+ebuEcho: ebuEcho.o errorChecking.o readFromInputFile.o writeToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-ebuComp: ebuComp.o memoryManagement.o loadFiles.o ebfErrorChecking.o ebfReadFromInputFile.o compareFiles.o conversionFunctions.o
+ebuComp: ebuComp.o memoryManagement.o loadFiles.o errorChecking.o readFromInputFile.o compareFiles.o conversionFunctions.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-ebu2ebf: ebu2ebf.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
+ebu2ebf: ebu2ebf.o errorChecking.o readFromInputFile.o writeToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-ebu2ebc: ebu2ebc.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
+ebu2ebc: ebu2ebc.o errorChecking.o readFromInputFile.o writeToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-ebcEcho: ebcEcho.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
+ebcEcho: ebcEcho.o errorChecking.o readFromInputFile.o writeToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-ebcComp: ebcComp.o memoryManagement.o loadFiles.o ebfErrorChecking.o ebfReadFromInputFile.o compareFiles.o conversionFunctions.o
+ebcComp: ebcComp.o memoryManagement.o loadFiles.o errorChecking.o readFromInputFile.o compareFiles.o conversionFunctions.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-ebc2ebu: ebc2ebu.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
+ebc2ebu: ebc2ebu.o errorChecking.o readFromInputFile.o writeToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
 	$(CC) $(CFLAGS) $^ -o $@

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "ebfStruct.h"
+#include "fileStructs.h"
 #include "conversionFunctions.h"
 
 // function coverts 1 pixel value from type ebfData file to binary format.

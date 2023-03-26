@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "ebfStruct.h"
+#include "fileStructs.h"
 #include "compareFiles.h"
 
 
