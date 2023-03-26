@@ -302,3 +302,25 @@ int outputFileDataCompressedBinary(ebcData *data, char *filename, FILE *outputFi
 
     return 0;
 }
+
+
+// function takes all data for ebu file and outputs it to ebc file
+// returns respective error codes if failed, 0 if otherwise
+int outputFileDataEbcDirectEbu(ebcData *data, char *filename, FILE *outputFile)
+{
+    // define the header that needs to be outputted to the file
+    unsigned char *header = (unsigned char *) "eu";
+    // output header to file and validate for success (0 means success)
+    if (outputHeader(header, data->height, data->width, outputFile) != 0)
+    {
+        return BAD_OUTPUT;
+    }
+    // output image data to file and validate for success (0 means success)
+    int errCode = outputImageDataBinary(data->dataBlockUncompressed, data->numBytesUncompressed, outputFile);
+    if (errCode != 0)
+    {
+        return errCode;
+    }
+
+    return 0;
+}

@@ -30,13 +30,14 @@ int outputFileDataEbuDirectEbc(ebuData *data, char *filename, FILE *outputFile);
 
 int outputImageDataEbuDirectEbc(ebuData *data, char *filename, FILE *outputFile);
 
+
 // for ebc to ebc outputs
 int outputFileDataCompressedBinary(ebcData *data, char *filename, FILE *outputFile);
 
+
 // for ebc to ebu outputs
+int outputFileDataEbcDirectEbu(ebcData *data, char *filename, FILE *outputFile);
 
 
-/*      NEEDS SPECIALISED FUNCTIONS TO WRITE EBC FILES      */
-// may be possible to write the entire dataBlock which is of guaranteed size numBytes
 
 
