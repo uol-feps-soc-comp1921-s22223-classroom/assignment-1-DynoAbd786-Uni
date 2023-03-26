@@ -102,3 +102,26 @@ int compareBinaryPixelValues(BYTE *dataBlock1, BYTE *dataBlock2, long numBytes)
     // return 0 for files are the same
     return 0;   
 }
+
+// compares compressed binary data agaisnt each other to check for differences
+// returns 1 if data is different, 0 if same
+// function also does not need to compare magic number
+int compareCompressedBinaryData(ebcData *data1, ebcData *data2)
+{
+    // checking if dimensions are the same
+    if (compareDimensions(data1->height, data2->height, data1->width, data2->width))
+    {
+        return 1;
+    }
+    
+    // checking if pixel values in compressed form are the same
+    if (compareBinaryPixelValues(data1->dataBlockCompressed, data2->dataBlockCompressed, data1->numBytesCompressed))
+    {
+        return 1;
+    }
+
+    // return 0 for files are the same
+    return 0;   
+}
+
+

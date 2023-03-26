@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "ebfStruct.h"
 #include "ebfErrorChecking.h"
@@ -47,7 +46,7 @@ int badArguements(int argc)
 // returns 1 if bad file is given
 int badFile(FILE *file, char *filename)
 {
-    if (!file || access(filename, R_OK) != 0)
+    if (!file)
     { // check file pointer
         printf("ERROR: Bad File Name (%s)\n", filename);
         return 1;
