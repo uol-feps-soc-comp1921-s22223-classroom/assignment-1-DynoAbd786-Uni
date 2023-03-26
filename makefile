@@ -7,15 +7,15 @@ CC     = gcc
 # -Werror means 'make all warnings into errors' which means your code doesn't compile with warnings
 # this is a good idea when code quality is important
 # -g enables the use of GDB
-CFLAGS = -std=c99 -Wall -Werror -g
+CFLAGS = -std=c99 -Wall -Werror -g -lm
 # this is your list of executables which you want to compile with all
-EXE = ebfEcho ebfComp ebf2ebu ebuEcho ebuComp ebu2ebf ebu2ebc
+EXE = ebfEcho ebfComp ebf2ebu ebuEcho ebuComp ebu2ebf ebu2ebc ebcEcho
 
-SRC = ebfEcho.c ebfComp.c ebf2ebu.c ebuEcho.c ebuComp.c ebu2ebf.c ebu2ebc.c ebfErrorChecking.c ebfReadFromInputFile.c ebfWriteToOutputFile.c loadFiles.c memoryManagement.c compareFiles.c conversionFunctions.c
+SRC = ebfEcho.c ebfComp.c ebf2ebu.c ebuEcho.c ebuComp.c ebu2ebf.c ebu2ebc.c ebcEcho.c ebfErrorChecking.c ebfReadFromInputFile.c ebfWriteToOutputFile.c loadFiles.c memoryManagement.c compareFiles.c conversionFunctions.c
 
 OBJ = $(SRCS:.c=.o)
 
-dependencies = ebfStruct.h ebfErrorChecking.h conversionFunctions.h ebfReadFromInputFile.h ebfWriteToOutputFile.h loadFiles.h memoryManagement.h compareFiles.h 
+dependencies = ebfStruct.h ebfErrorChecking.h conversionFunctions.h ebfReadFromInputFile.h ebfWriteToOutputFile.h loadFiles.h memoryManagement.h compareFiles.h math.h
 
 
 # we put 'all' as the first command as this will be run if you just enter 'make'
@@ -42,46 +42,47 @@ clean:
 
 
 
-ebfEcho: ebfEcho.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
-	$(CC) $(CCFLAGS) $^ -o $@
+ebfEcho: ebfEcho.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o 
+	$(CC) $(CFLAGS) $^ -o $@
 
 ebfErrorChecking: ebfErrorChecking.o 
-	$(CC) $(CCFLAGS) $^ -o $@
-
+	$(CC) $(CFLAGS) $^ -o $@
 
 ebfWriteToOutputFile: ebfWriteToOutputFile.o memoryManagement.o conversionFunctions.o ebfErrorChecking.o
-	$(CC) $(CCFLAGS) $^ -o $@
-
+	$(CC) $(CFLAGS) $^ -o $@
 
 ebfReadFromInputFile: ebfReadFromInputFile.o memoryManagement.o conversionFunctions.o
-	$(CC) $(CCFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@
 
 loadFiles: loadFiles.o
-	$(CC) $(CCFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@
 
 memoryManagement: memoryManagement.o
-	$(CC) $(CCFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@
 
 ebfComp: ebfComp.o memoryManagement.o loadFiles.o ebfErrorChecking.o ebfReadFromInputFile.o compareFiles.o conversionFunctions.o
-	$(CC) $(CCFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@
 
 compareFiles: compareFiles.o
-	$(CC) $(CCFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@
 
 ebf2ebu: ebf2ebu.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
-	$(CC) $(CCFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@
 
 conversionFunctions: conversionFunctions.o
-	$(CC) $(CCFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@
 
 ebuEcho: ebuEcho.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
-	$(CC) $(CCFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@
 
 ebuComp: ebuComp.o memoryManagement.o loadFiles.o ebfErrorChecking.o ebfReadFromInputFile.o compareFiles.o conversionFunctions.o
-	$(CC) $(CCFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@
 
 ebu2ebf: ebu2ebf.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
-	$(CC) $(CCFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@
 
 ebu2ebc: ebu2ebc.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
-	$(CC) $(CCFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@
+
+ebcEcho: ebcEcho.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
+	$(CC) $(CFLAGS) $^ -o $@

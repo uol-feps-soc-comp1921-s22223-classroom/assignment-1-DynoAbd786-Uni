@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 #include "ebfStruct.h"
 #include "ebfErrorChecking.h"
@@ -390,13 +391,13 @@ int setCompressedBinaryImageDataArrayEbc(ebcData *data)
 
     // extra bit of logic to account for any overhead in the file
     // if there is a remainder from numBytesUncompressed, there is an extra byte that is storing information that needs to be collected
-    if ((data->numBytesUncompressed % (8.0 / 5.0) != 0.0)
+    if (fmod(data->numBytesUncompressed, 1/COMPRESSION_FACTOR) != 0.0)
     {
-        data->numBytesCompressed = ((data->height * data->width) * (8 / 5)) + 1;
+        data->numBytesCompressed = ((data->height * data->width) * (1/COMPRESSION_FACTOR)) + 1;
     }
     else
     {
-        data->numBytesCompressed = ((data->numBytesUncompressed) * (8 / 5));
+        data->numBytesCompressed = ((data->numBytesUncompressed) * (1/COMPRESSION_FACTOR));
     }
 
     // allocate memory for imageData
@@ -435,7 +436,7 @@ int setCompressedBinaryImageDataArrayEbc(ebcData *data)
 }
 
 // gets image data from an ebc compressed binary file
-int getCompressedBinaryImageDataArray(inputData, inputFile, filename);
+int getCompressedBinaryImageDataArray(ebcData *data, FILE *inputFile, char *filename)
 {
     // cycle to next line ("grabs" new line char)
     fgetc(inputFile);
@@ -446,8 +447,15 @@ int getCompressedBinaryImageDataArray(inputData, inputFile, filename);
     // read in all the compressed pixel data
     fread(data->dataBlockCompressed, sizeof(BYTE), data->numBytesCompressed, inputFile);
 
-    // decompress data to check individual pixel value 
-    int convertEbc2Ebu(inputData);
+    // decompress data to check individual pixel value
+    // check if number of decompressed bytes matches the assigned numBytesUncompressed
+    long i = convertEbc2Ebu(data);
+
+    printf("%ld, %ld\n", i, data->numBytesUncompressed);
+    if (badNumBytes(i, data->numBytesUncompressed, filename))
+    {
+        return BAD_DATA;
+    } 
 
     for (int byteNumber = 0; byteNumber < data->numBytesUncompressed; byteNumber++)
     {
@@ -458,24 +466,10 @@ int getCompressedBinaryImageDataArray(inputData, inputFile, filename);
         }
     }
 
-
-    for (int byteNumber = 0; byteNumber < data->numBytesCompressed; byteNumber++)
-    {
-        // checking if no bytes has been read (for low bad data)
-        if (badByteRead(fread(&data->dataBlock[byteNumber], sizeof(BYTE), 1, inputFile), filename))
-        {
-            return BAD_DATA;
-        }
-        // checking if pixel value is correct by converting to an int and passing it as an arguement
-        else if (badPixelValue(convertEbu2Ebf(data->dataBlock[byteNumber]), filename))
-        {
-            return BAD_DATA;
-        }
-    }
     
-    // extra bit of code to get rid of the null char (i think its a null)
-    BYTE tmp;
-    fread(&tmp, sizeof(BYTE), 2, inputFile);
+    // // extra bit of code to get rid of the null char (i think its a null)
+    // BYTE tmp;
+    // fread(&tmp, sizeof(BYTE), 2, inputFile);
     
 
     // check if end of file has been reached
