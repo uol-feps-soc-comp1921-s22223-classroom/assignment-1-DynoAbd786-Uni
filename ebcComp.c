@@ -32,17 +32,17 @@ int main(int argc, char **argv)
     /*      TAKING INPUT FROM FILES      */
 
     // initialise an empty array to store file data (max files to compare is 2)
-    ebuData *dataToCompare[MAX_FILE_COMPARISON];
+    ebcData *dataToCompare[MAX_FILE_COMPARISON];
 
     // looping through the number of files to compare
     for (int fileNumber = 0; fileNumber < MAX_FILE_COMPARISON; fileNumber++)
     {
-        // allocate data for array of type ebu
-        dataToCompare[fileNumber] = mallocEbu();
+        // allocate data for array of type ebc
+        dataToCompare[fileNumber] = mallocEbc();
         // checking if struct has been malloc'd
         if (badMalloc(dataToCompare[fileNumber]))
         {
-            freeEbuDataArray(dataToCompare);
+            freeEbcDataArray(dataToCompare);
             return BAD_MALLOC;
         }
 
@@ -52,28 +52,28 @@ int main(int argc, char **argv)
         // check file opened successfully
         if (badFile(inputFile, inputFilename))
         { // check file pointer
-            freeEbuDataArray(dataToCompare);
+            freeEbcDataArray(dataToCompare);
             return BAD_FILE;
         } // check file pointer
 
         // checking if any error codes arise when getting data (0 means success)
-        int errCode = getFileDataBinary(dataToCompare[fileNumber], inputFilename, inputFile);
+        int errCode = getFileDataCompressedBinary(dataToCompare[fileNumber], inputFilename, inputFile);
         if (errCode != 0)
         {
             // exit with the error code and free any data used in the program
-            freeEbuDataArray(dataToCompare);
+            freeEbcDataArray(dataToCompare);
             fclose(inputFile);
             return errCode;
         }
+
         fclose(inputFile);
     }
-    
 
     /*      COMPARING DATA BETWEEN FILES      */
 
     // running function to check if file data is the same
     // prints different if return value is 1, identical if return value is 0
-    if (compareBinaryData(dataToCompare[0], dataToCompare[1]))
+    if (compareCompressedBinaryData(dataToCompare[0], dataToCompare[1]))
     {
         printf("DIFFERENT\n");
     }
@@ -83,6 +83,6 @@ int main(int argc, char **argv)
     }
 
     // free the data array and close the progran with return value SUCCESS.
-    freeEbuDataArray(dataToCompare);
+    freeEbcDataArray(dataToCompare);
     return SUCCESS;
 } // main()
