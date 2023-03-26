@@ -15,8 +15,12 @@
 int getFileData(ebfData *inputData, char* filename, FILE *inputFile)
 {   
     // set first 2 characters which should be magic number
-    getMagicNumber(inputFile, inputData->magicNumber);
-
+    int errCode = getMagicNumber(inputFile, inputData->magicNumber);
+    // checking for correct file format
+    if (errCode != 0)
+    {
+        return errCode;
+    }
 
     // checking if the magic number matches the known magic number value
     // checking against the casted value due to endienness.
@@ -57,14 +61,22 @@ int getFileData(ebfData *inputData, char* filename, FILE *inputFile)
 
 
 // read in magic number from file are store it to the struct
-void getMagicNumber(FILE *inputFile, unsigned char *magicNumber)
+// returns 100 if the file format is wrong after reading in the magic number
+int getMagicNumber(FILE *inputFile, unsigned char *magicNumber)
 {
     magicNumber[0] = getc(inputFile);
     magicNumber[1] = getc(inputFile);
+
+    if (noWhitespaceOrNull(getc(inputFile)))
+    {
+        return MISCELLANEOUS;
+    }
+
+    return 0;
 }
 
 
-// finds and returns error (1) if magic number values do not match
+// finds magic number value
 unsigned short *getMagicNumberValue(unsigned char *magicNumber)
 {
     // casting chars to unsigned short 
@@ -75,7 +87,6 @@ unsigned short *getMagicNumberValue(unsigned char *magicNumber)
 
 // read in dimensions and return number of values scanned
 // returns number of values read from file, or -1 for error
-/* NEEDS ERROR CHECKING PER LINE */
 int getDimensions(int *height, int *width, FILE *inputFile)
 {
     int check = fscanf(inputFile, "%d %d", height, width);
@@ -84,7 +95,6 @@ int getDimensions(int *height, int *width, FILE *inputFile)
 
 
 /*      FOR EBF FILES       */
-
 
 // mallocs an array for the data to be stored in.
 // returns any error code that may arise during the malloc, 0 for no errors
@@ -134,13 +144,10 @@ int getImageDataArray(ebfData *data, FILE *inputFile, char *filename)
         return BAD_MALLOC;
     } // check malloc
 
-
-    // check to see if fgets has cycled to next line (sitting on line with the magic numbers currently)
-    if (noMoreLines(fgets(input, sizeof(input), inputFile), filename))
+    // checks and cycles to next line (sitting on line with the dimensions currently)
+    if (noWhitespaceOrNull(getc(inputFile)))
     {
-        // ensure that allocated data is freed before exit.
-        freeEbfReadDataArrays(input, inputIntArray);
-        return BAD_DATA;
+        return MISCELLANEOUS;
     }
 
     // malloc an array of pointers to unsigned ints
@@ -227,7 +234,12 @@ int getImageDataArray(ebfData *data, FILE *inputFile, char *filename)
 int getFileDataBinary(ebuData *inputData, char* filename, FILE *inputFile)
 {   
     // set first 2 characters which should be magic number
-    getMagicNumber(inputFile, inputData->magicNumber);
+    int errCode = getMagicNumber(inputFile, inputData->magicNumber);
+    // checking for correct file format
+    if (errCode != 0)
+    {
+        return errCode;
+    }
 
     // checking if the magic number matches the known magic number value
     // checking against the casted value due to endienness.
@@ -300,8 +312,11 @@ int setBinaryImageDataArrayEbu(ebuData *data)
 // gets image data from an ebu binary file
 int getBinaryImageDataArray(ebuData *data, FILE *inputFile, char *filename)
 {
-    // cycle to next line ("grabs" new line char)
-    fgetc(inputFile);
+    // checks and cycles to next line (sitting on line with the dimensions currently)
+    if (noWhitespaceOrNull(getc(inputFile)))
+    {
+        return MISCELLANEOUS;
+    }
     
     // reading directly into the 1D array dataBlock, which should by definition also store to the 2D block
     // keeping a track of count in case # of pixels in file doesnt match # of bytes stated in header of file 
@@ -319,7 +334,7 @@ int getBinaryImageDataArray(ebuData *data, FILE *inputFile, char *filename)
         }
     }
     
-    // extra bit of code to get rid of the null char (i think its a null)
+    // extra bit of code to get rid of the null char so the file indicates EOF
     BYTE tmp;
     fread(&tmp, sizeof(BYTE), 2, inputFile);
     
@@ -343,7 +358,12 @@ int getBinaryImageDataArray(ebuData *data, FILE *inputFile, char *filename)
 int getFileDataCompressedBinary(ebcData *inputData, char* filename, FILE *inputFile)
 {   
     // set first 2 characters which should be magic number
-    getMagicNumber(inputFile, inputData->magicNumber);
+    int errCode = getMagicNumber(inputFile, inputData->magicNumber);
+    // checking for correct file format
+    if (errCode != 0)
+    {
+        return errCode;
+    }
 
     // checking if the magic number matches the known magic number value
     // checking against the casted value due to endienness.
@@ -426,8 +446,11 @@ int setCompressedBinaryImageDataArrayEbc(ebcData *data)
 // gets image data from an ebc compressed binary file
 int getCompressedBinaryImageDataArray(ebcData *data, FILE *inputFile, char *filename)
 {
-    // cycle to next line ("grabs" new line char)
-    fgetc(inputFile);
+    // checks and cycles to next line (sitting on line with the dimensions currently)
+    if (noWhitespaceOrNull(getc(inputFile)))
+    {
+        return MISCELLANEOUS;
+    }
     
     // read in all the compressed pixel data
     fread(data->dataBlockCompressed, sizeof(BYTE), data->numBytesCompressed, inputFile);

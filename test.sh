@@ -37,6 +37,8 @@ touch tests/data/bad.out
 chmod -w tests/data/bad.out
 chmod -r tests/data/ebf_data/bad_perms.ebf
 chmod -r tests/data/ebu_data/bad_perms.ebu
+chmod -r tests/data/ebc_data/bad_perms.ebc
+
 
 # keep track of score and total count of tests
 total=0
@@ -322,6 +324,7 @@ done
 chmod +w tests/data/bad.out
 chmod +r tests/data/ebf_data/bad_perms.ebf
 chmod +r tests/data/ebu_data/bad_perms.ebu
+chmod +r tests/data/ebc_data/bad_perms.ebc
 ###### YOU CAN EDIT BELOW THIS POINT
 
 # the run_test function has been incrementing both a counter for how many tests have run
