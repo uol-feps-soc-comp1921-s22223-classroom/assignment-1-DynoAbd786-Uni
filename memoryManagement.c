@@ -149,14 +149,6 @@ ebcData *mallocEbc()
 // frees 1 data entry from the type ebcData
 void freeEbcData(ebcData *data)
 {
-    // checks if imageData has been malloc'd
-    if (data->imageData != NULL)
-    {
-        // free and dereference imageData to NULL to avoid hanging pointer
-        free(data->imageData);
-        data->imageData = NULL;
-    }
-
     // checks if dataBlockUncompressed has been malloc'd
     if (data->dataBlockUncompressed != NULL)
     {

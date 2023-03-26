@@ -36,71 +36,63 @@ BYTE *convertEbu2Ebc(BYTE *uncompressedPixelValues, BYTE *compressedBinaryArray,
         {
             // grab the least significant bit at the position bitNumber
             int bitAtBitNumber = (uncompressedPixelValues[byteNumber] >> (bitNumber - 1)) & 0x01;
-            
-
             // overwrite the storageByte to contain the LSB and the information of the storageByte at correct positions
             storageByte = (storageByte << 1) | bitAtBitNumber;
 
             // moving to the next bit
-            compressedBitPostitionTracker++;
-            printf("%i, %u\n", compressedBitPostitionTracker, storageByte);
-            
+            compressedBitPostitionTracker++;            
             
             // checking if the byte is full of information
             if (compressedBitPostitionTracker == MAX_BITS_IN_BYTE)
             {
-                
                 // write the storageByte to the compressed array and increment the array to the next position
                 compressedBinaryArray[compressedBinaryArrayPostitionTracker] = storageByte;
-                // printf("%u, %u \n", compressedBinaryArray[0], compressedBinaryArray[1]);
                 compressedBinaryArrayPostitionTracker++;
                 // reset all variables for the next byte
                 storageByte = 0;
                 compressedBitPostitionTracker = 0;
-                
             }
         }
     }
 
-    // shift bytes to remauining positions
+    // shift bytes to remaining positions
     storageByte = (storageByte << (MAX_BITS_IN_BYTE - compressedBitPostitionTracker));
-
 
     // output final byte to the compressed array
     compressedBinaryArray[compressedBinaryArrayPostitionTracker] = storageByte;
-
-    printf("%u, %u, %u \n", compressedBinaryArray[0], compressedBinaryArray[1], compressedBinaryArray[2]);
 
     return compressedBinaryArray;
 }
 
 // function converts an array of compressed binary pixels to uncompressed binary format
 // works within the data struct since arrays for both compressed and uncompressed binary arrays have been defined
-// reason for this: need to check pixel values, so only way to do that is to decompress image data
-int convertEbc2Ebu(ebcData *data)
+// reason for this: need to check amount of pixels, so only way to do that is to decompress image data
+long convertEbc2Ebu(ebcData *data)
 {
+    // variables for storing and tracking compressed binary information
     BYTE storageByte = 0;
-    int uncompressedBinaryArrayPostitionTracker = 0;
+    long uncompressedBinaryArrayPostitionTracker = 0;
     int uncompressedBitPostitionTracker = 0;
 
-    for (int byteNumber = 0; byteNumber < 3; byteNumber++)
+    // for every compressed byte inside the compressed array
+    for (int byteNumber = 0; byteNumber < data->numBytesCompressed; byteNumber++)
     {
+        // for every bit inside every byte
         for (int bitNumber = MAX_BITS_IN_BYTE; bitNumber > 0; bitNumber--)
         {
-            // grab the least significant bit at the position bitNumber
+            // grab the bit at the position bitNumber
             int bitAtBitNumber = (data->dataBlockCompressed[byteNumber] >> (bitNumber - 1)) & 0x01;
-
+            // write the bit to the storage byte and overwrite it with the bits shifted left by 1
             storageByte = (storageByte << 1) | bitAtBitNumber;
-            printf("%i, %i, %u\n", byteNumber, bitNumber, storageByte);
-
+            // increment to keep track of how much the byte has been filled by
             uncompressedBitPostitionTracker++;
 
             // checking if the byte is full of information
             if (uncompressedBitPostitionTracker == MAX_BITS_IN_UNCOMPRESSED_BYTE)
             {
-                printf("next\n");
-                // accounting for the problem where if the algorithm reaches the end of the array, NULL chars may be picked up instead of 0's
-                if (!(storageByte == 0 && uncompressedBinaryArrayPostitionTracker + 1 == data->numBytesUncompressed))
+                // accounting for the problem where if the algorithm reaches the end of the array, NULL chars may be picked up
+                // this happens when the compressed array has numBytesCompressed that isnt divisible by 1/COMPRESSION_FACTOR
+                if (!(storageByte == 0 && uncompressedBinaryArrayPostitionTracker >= data->numBytesUncompressed))
                 {
                     // write the storageByte to the uncompressed array and increment the array to the next position
                     data->dataBlockUncompressed[uncompressedBinaryArrayPostitionTracker] = storageByte;
@@ -116,5 +108,5 @@ int convertEbc2Ebu(ebcData *data)
     }
 
     // returns the number of decompressed bytes read into the array
-    return uncompressedBinaryArrayPostitionTracker + 1;
+    return uncompressedBinaryArrayPostitionTracker;
 }

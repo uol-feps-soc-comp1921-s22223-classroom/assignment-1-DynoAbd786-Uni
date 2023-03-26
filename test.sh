@@ -184,6 +184,11 @@ do
     full_path=$path$filename$file_ext
     run_test ./$testExecutable $full_path "tmp" 5  "ERROR: Image Malloc Failed"
 
+    # cannot test for bad pixel values since the decompression algorithm only checks for the 1st 5 bits in a file
+    # therefore pixels has a guaranteed range of 0 to 31
+    if [[ ${testExecutable:0:3} != "ebc" ]]
+    then
+
     # data has a greyvalue above the maximum permitted value
     echo ""
     echo "Bad Data (too high)"
@@ -197,6 +202,7 @@ do
     filename="bad_data_low"
     full_path=$path$filename$file_ext
     run_test ./$testExecutable $full_path "tmp" 6 "ERROR: Bad Data ($full_path)"
+    fi
 
     # too many greyvalues compared to the actual dimensions of the file
     echo ""
@@ -332,6 +338,6 @@ echo "--------------------------------------------------------------------------
 # and any object files are removed.
 
 # remove the files we created during the tests
-# rm tmp null
+rm tmp null
 # and run make clean to remove object files
 make clean

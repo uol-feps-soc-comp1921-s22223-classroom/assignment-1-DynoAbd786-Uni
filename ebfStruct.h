@@ -74,7 +74,6 @@ typedef struct
     int width, height;
     long numBytesUncompressed;
     long numBytesCompressed;
-    BYTE **imageData;
     BYTE *dataBlockCompressed;
     BYTE *dataBlockUncompressed;
 }

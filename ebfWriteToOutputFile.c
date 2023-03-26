@@ -271,20 +271,12 @@ int outputImageDataEbuDirectEbc(ebuData *data, char *filename, FILE *outputFile)
 
     // convert uncompressed binary format to compressed binary
     compressedBinaryArray = convertEbu2Ebc(data->dataBlock, compressedBinaryArray, data->numBytes);
-    
-    for (int i = 0; i < sizeOfCompressedBinaryArray; i++)
-    {
-        printf("%u ", compressedBinaryArray[i]);
-    }
 
     // write the entire dataBlock to the file
-    // int check = 
-    fwrite(compressedBinaryArray, sizeOfCompressedBinaryArray, 1, outputFile);
-    // if (badOutput(check))
-    // {
-    //     printf("here, %i\n", check);
-    //     return BAD_OUTPUT;
-    // }
+    if (badOutput(fwrite(compressedBinaryArray, sizeOfCompressedBinaryArray, 1, outputFile)))
+    {
+        return BAD_OUTPUT;
+    }
 
     // free malloc'd compressed binary array
     free(compressedBinaryArray);
