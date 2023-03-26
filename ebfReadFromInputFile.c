@@ -389,27 +389,20 @@ int setCompressedBinaryImageDataArrayEbc(ebcData *data)
     // caclulate total size and allocate memory for array
     data->numBytesUncompressed = data->height * data->width;
 
+
     // extra bit of logic to account for any overhead in the file
     // if there is a remainder from numBytesUncompressed, there is an extra byte that is storing information that needs to be collected
-    if (fmod(data->numBytesUncompressed, 1/COMPRESSION_FACTOR) != 0.0)
+    if (fmod(data->numBytesUncompressed, COMPRESSION_FACTOR) != 0.0)
     {
-        data->numBytesCompressed = ((data->height * data->width) * (1/COMPRESSION_FACTOR)) + 1;
+        data->numBytesCompressed = ((data->numBytesUncompressed) * (COMPRESSION_FACTOR)) + 1;
     }
     else
     {
-        data->numBytesCompressed = ((data->numBytesUncompressed) * (1/COMPRESSION_FACTOR));
+        data->numBytesCompressed = ((data->numBytesUncompressed) * (COMPRESSION_FACTOR));
     }
 
-    // allocate memory for imageData
-    data->imageData = (BYTE **) malloc(data->numBytesUncompressed * sizeof(BYTE *));
-
-    // if malloc is unsuccessful, it will return a BAD MALLOC error code
-    if (badMalloc(data->imageData))
-    { // check malloc
-        return BAD_MALLOC;
-    } // check malloc
-
-    // uncompressed data block malloc'd to set up 2D array for imageData
+    // uncompressed data block malloc'd
+    // 2D imageData not needed since the program can just write the whole block in 1 go
     data->dataBlockUncompressed = (BYTE *) malloc(data->numBytesUncompressed * sizeof(BYTE));
 
     // if malloc is unsucessful, it will return a null pointer
@@ -427,11 +420,6 @@ int setCompressedBinaryImageDataArrayEbc(ebcData *data)
         return BAD_MALLOC;
     } // check malloc
 
-    // pointer arithmetic to set up 2D array 
-    for (int row = 0; row < data->height; row++)
-    {
-        data->imageData[row] = data->dataBlockUncompressed + row * data->width;
-    }
     return 0;
 }
 
@@ -441,35 +429,21 @@ int getCompressedBinaryImageDataArray(ebcData *data, FILE *inputFile, char *file
     // cycle to next line ("grabs" new line char)
     fgetc(inputFile);
     
-    // reading directly into the 1D array dataBlock, which should by definition also store to the 2D block
-    // keeping a track of count in case # of pixels in file doesnt match # of bytes stated in header of file 
-
     // read in all the compressed pixel data
     fread(data->dataBlockCompressed, sizeof(BYTE), data->numBytesCompressed, inputFile);
 
-    // decompress data to check individual pixel value
+    // decompress data to check individual amount of pixels in file
+    // not possible in this case to check pixel values, since compressed size has only 2^5 bits
+    // therefore has guaranteed range of 0 to 31
     // check if number of decompressed bytes matches the assigned numBytesUncompressed
-    long i = convertEbc2Ebu(data);
-
-    printf("%ld, %ld\n", i, data->numBytesUncompressed);
-    if (badNumBytes(i, data->numBytesUncompressed, filename))
+    if (badNumBytes(convertEbc2Ebu(data), data->numBytesUncompressed, filename))
     {
         return BAD_DATA;
     } 
-
-    for (int byteNumber = 0; byteNumber < data->numBytesUncompressed; byteNumber++)
-    {
-        // checking if pixel value is correct by converting to an int and passing it as an arguement
-        if (badPixelValue(convertEbu2Ebf(data->dataBlockUncompressed[byteNumber]), filename))
-        {
-            return BAD_DATA;
-        }
-    }
-
     
-    // // extra bit of code to get rid of the null char (i think its a null)
-    // BYTE tmp;
-    // fread(&tmp, sizeof(BYTE), 2, inputFile);
+    // extra bit of code to get rid of the null char (i think its a null)
+    BYTE tmp;
+    fread(&tmp, sizeof(BYTE), 1, inputFile);
     
 
     // check if end of file has been reached
