@@ -9,9 +9,9 @@ CC     = gcc
 # -g enables the use of GDB
 CFLAGS = -std=c99 -Wall -Werror -g -lm
 # this is your list of executables which you want to compile with all
-EXE = ebfEcho ebfComp ebf2ebu ebuEcho ebuComp ebu2ebf ebu2ebc ebcEcho ebcComp
+EXE = ebfEcho ebfComp ebf2ebu ebuEcho ebuComp ebu2ebf ebu2ebc ebcEcho ebcComp ebc2ebu
 
-SRC = ebfEcho.c ebfComp.c ebf2ebu.c ebuEcho.c ebuComp.c ebu2ebf.c ebu2ebc.c ebcEcho.c ebcComp.c ebfErrorChecking.c ebfReadFromInputFile.c ebfWriteToOutputFile.c loadFiles.c memoryManagement.c compareFiles.c conversionFunctions.c
+SRC = ebfEcho.c ebfComp.c ebf2ebu.c ebuEcho.c ebuComp.c ebu2ebf.c ebu2ebc.c ebcEcho.c ebcComp.c ebc2ebu.c ebfErrorChecking.c ebfReadFromInputFile.c ebfWriteToOutputFile.c loadFiles.c memoryManagement.c compareFiles.c conversionFunctions.c
 
 OBJ = $(SRCS:.c=.o)
 
@@ -88,4 +88,7 @@ ebcEcho: ebcEcho.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFil
 	$(CC) $(CFLAGS) $^ -o $@
 
 ebcComp: ebcComp.o memoryManagement.o loadFiles.o ebfErrorChecking.o ebfReadFromInputFile.o compareFiles.o conversionFunctions.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+ebc2ebu: ebc2ebu.o ebfErrorChecking.o ebfReadFromInputFile.o ebfWriteToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
 	$(CC) $(CFLAGS) $^ -o $@
