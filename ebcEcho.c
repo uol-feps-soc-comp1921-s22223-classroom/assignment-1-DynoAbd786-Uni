@@ -53,7 +53,7 @@ int main(int argc, char **argv)
     if (errCode != 0)
     {
         // exit with the error code and free any data used in the program
-        freeEbcuData(inputData);
+        freeEbcData(inputData);
         fclose(inputFile);
         return errCode;
     }
@@ -74,19 +74,19 @@ int main(int argc, char **argv)
 
     
     // output to file
-    errCode = outputFileDataBinary(inputData, outputFilename, outputFile);
+    errCode = outputFileDataCompressedBinary(inputData, outputFilename, outputFile);
     // checking for any error codes
     if (errCode != 0)
     {
         // exit with the error code and free any data used in the program
-        freeEbuData(inputData);
+        freeEbcData(inputData);
         fclose(outputFile);
         return errCode;
     }
 
     // print final success message, free and return
     printf("ECHOED\n");
-    freeEbuData(inputData);
+    freeEbcData(inputData);
     fclose(outputFile);
     return SUCCESS;
 } // main()

@@ -219,10 +219,11 @@ int badByteRead(int count, char *filename)
 
 /*      SPECIALISED FOR COMPRESSED BINARY RELATED FILES        */
 // compares the amount of decompressed bytes retuned by the conversion algorithm agaisnt the expected numBytes
-int badNumBytes(int count, int numBytesUncompressed)
+int badNumBytes(long count, long numBytesUncompressed, char *filename)
 {
     if (count != numBytesUncompressed)
     {
+        printf("ERROR: Bad Data (%s)\n", filename);
         return 1;
     }
 

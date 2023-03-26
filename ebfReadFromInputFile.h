@@ -21,3 +21,5 @@ int getBinaryImageDataArray(ebuData *data, FILE *inputFile, char *filename);
 int getFileDataCompressedBinary(ebcData *inputData, char* filename, FILE *inputFile);
 
 int setCompressedBinaryImageDataArrayEbc(ebcData *data);
+
+int getCompressedBinaryImageDataArray(ebcData *data, FILE *inputFile, char *filename);

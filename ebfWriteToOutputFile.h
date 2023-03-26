@@ -19,8 +19,7 @@ int outputFileDataEbuDirectEbf(ebuData *data, char *filename, FILE *outputFile);
 int outputImageDataEbuDirectEbf(BYTE **imageData, int height, int width, FILE *outputFile);
 
 
-// for ebu to ebu/ebc to ebc outputs
-// essentially anything that works to output binary to binary
+// for ebu to ebu outputs
 int outputFileDataBinary(ebuData *data, char *filename, FILE *outputFile);
 
 int outputImageDataBinary(BYTE *dataBlock, long numBytes, FILE *outputFile);
@@ -31,6 +30,10 @@ int outputFileDataEbuDirectEbc(ebuData *data, char *filename, FILE *outputFile);
 
 int outputImageDataEbuDirectEbc(ebuData *data, char *filename, FILE *outputFile);
 
+// for ebc to ebc outputs
+int outputFileDataCompressedBinary(ebcData *data, char *filename, FILE *outputFile);
+
+// for ebc to ebu outputs
 
 
 /*      NEEDS SPECIALISED FUNCTIONS TO WRITE EBC FILES      */
