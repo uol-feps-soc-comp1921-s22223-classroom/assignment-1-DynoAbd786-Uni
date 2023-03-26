@@ -231,8 +231,6 @@ int badNumBytes(long count, long numBytesUncompressed, char *filename)
 }
 
 
-
-
 /*      BAD OUTPUT     */
 // checks to see if the data is being outputted correctly
 // returns 1 if the fprintf statement has had an error occur, or if nothing has been printed to the file
@@ -243,6 +241,24 @@ int badOutput(int check)
         printf("ERROR: Bad Output\n");
         return 1;
     }
+
+    return 0;
+}
+
+
+/*      MISCELLANEOUS ERRORS    */
+
+/*      BAD FILE FORMAT     */
+// functions in this header checks if the format of the input file is correct
+// information derived from the pgm document provided by github
+int noWhitespaceOrNull(char character)
+{
+    int asciiValue = (int) character;
+    if (!(asciiValue == 10 || asciiValue == 9 || asciiValue == 32 || asciiValue == 0))
+    {
+        printf("ERROR: Miscellaneous (file format is incorrect (no whitespace char where there is meant to be a whitespace char))");
+        return 1;
+    } 
 
     return 0;
 }

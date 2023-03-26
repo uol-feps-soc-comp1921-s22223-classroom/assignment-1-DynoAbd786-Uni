@@ -2,7 +2,7 @@
 
 int getFileData(ebfData *inputData, char *filename, FILE *inputFile);
 
-void getMagicNumber(FILE *inputFile, unsigned char *data);
+int getMagicNumber(FILE *inputFile, unsigned char *data);
 
 unsigned short *getMagicNumberValue(unsigned char *magicNumber);
 

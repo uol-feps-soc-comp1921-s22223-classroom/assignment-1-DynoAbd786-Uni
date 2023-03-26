@@ -10,6 +10,7 @@
 #define BAD_MALLOC 5
 #define BAD_DATA 6
 #define BAD_OUTPUT 7
+#define MISCELLANEOUS 100
 #define MAGIC_NUMBER_EBF 0x6265
 #define MAGIC_NUMBER_EBU 0x7565
 #define MAGIC_NUMBER_EBC 0x6365
@@ -52,3 +53,5 @@ int badByteRead(int count, char *filename);
 int badNumBytes(long count, long numBytesUncompressed, char *filename);
 
 int badOutput(int check);
+
+int noWhitespaceOrNull(char character);
