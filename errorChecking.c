@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "ebfStruct.h"
-#include "ebfErrorChecking.h"
+#include "fileStructs.h"
+#include "errorChecking.h"
 
 // all functions within this file return 1 for any error detected, 0 otherwise
 

@@ -4,11 +4,11 @@
 #include <ctype.h>
 #include <math.h>
 
-#include "ebfStruct.h"
-#include "ebfErrorChecking.h"
+#include "fileStructs.h"
+#include "errorChecking.h"
 #include "conversionFunctions.h"
 #include "memoryManagement.h"
-#include "ebfReadFromInputFile.h"
+#include "readFromInputFile.h"
 
 // executes a series of funcions to gather and check all data from an ebf file
 // returns respected error code to the error that may have occured in the file, 0 if successful
@@ -464,7 +464,7 @@ int getCompressedBinaryImageDataArray(ebcData *data, FILE *inputFile, char *file
         return BAD_DATA;
     } 
     
-    // extra bit of code to get rid of the null char (i think its a null)
+    // extra bit of code to get rid of the null char so the file indicates EOF
     BYTE tmp;
     fread(&tmp, sizeof(BYTE), 1, inputFile);
     

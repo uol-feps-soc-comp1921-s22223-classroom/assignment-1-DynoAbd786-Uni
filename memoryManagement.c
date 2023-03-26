@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "ebfStruct.h"
-#include "ebfErrorChecking.h"
+#include "fileStructs.h"
+#include "errorChecking.h"
 #include "memoryManagement.h"
-
 
 
 /*      EBF DATA MEMORY RELATED FUNCTIONS      */

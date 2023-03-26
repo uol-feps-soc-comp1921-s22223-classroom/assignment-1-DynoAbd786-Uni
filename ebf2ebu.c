@@ -3,12 +3,12 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "ebfStruct.h"
+#include "fileStructs.h"
 #include "memoryManagement.h"
-#include "ebfErrorChecking.h"
+#include "errorChecking.h"
 #include "loadFiles.h"
-#include "ebfReadFromInputFile.h"
-#include "ebfWriteToOutputFile.h"
+#include "readFromInputFile.h"
+#include "writeToOutputFile.h"
 
 
 int main(int argc, char **argv)

@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "ebfStruct.h"
+#include "fileStructs.h"
 #include "conversionFunctions.h"
-#include "ebfErrorChecking.h"
+#include "errorChecking.h"
 #include "memoryManagement.h"
-#include "ebfWriteToOutputFile.h"
+#include "writeToOutputFile.h"
 
 
 // executes a series of functions to write to a file
