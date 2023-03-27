@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include "fileStructs.h"
 #include "compareFiles.h"
 
@@ -83,7 +81,6 @@ int compareBinaryData(ebuData *data1, ebuData *data2)
 }
 
 
-// TEST IF INT CAST IS REQUIRED
 // compares binary pixel values agaisnt each other
 // returns 1 if the data is different, 0 if same
 int compareBinaryPixelValues(BYTE *dataBlock1, BYTE *dataBlock2, long numBytes)
@@ -92,7 +89,7 @@ int compareBinaryPixelValues(BYTE *dataBlock1, BYTE *dataBlock2, long numBytes)
     for (int byteNumber = 0; byteNumber < numBytes; byteNumber++)
     {
         // checking if the pixel values match
-        if ((int) dataBlock1[byteNumber] != (int) dataBlock2[byteNumber])
+        if (dataBlock1[byteNumber] != dataBlock2[byteNumber])
         {
             // return 1 if different
             return 1;

@@ -9,6 +9,7 @@
 /*      EBF DATA MEMORY RELATED FUNCTIONS      */
 
 // mallocs an uninitialised struct of type ebfData to store file information to
+// returns the data struct
 ebfData *mallocEbf()
 {
     ebfData *data = (ebfData *) malloc(sizeof(ebfData));
@@ -78,12 +79,10 @@ void freeEbfReadDataArrays(char *input, unsigned int *inputIntArray)
 }
 
 
-
-
-
 /*      EBU DATA MEMORY RELATED FUNCTIONS      */
 
 // mallocs an uninitialised struct of type ebuData to store file information to
+// returns the data struct
 ebuData *mallocEbu()
 {
     ebuData *data = (ebuData *) malloc(sizeof(ebuData));
@@ -133,12 +132,10 @@ void freeEbuDataArray(ebuData *dataToCompare[])
 }
 
 
-
-
-
 /*      EBC DATA MEMORY RELATED FUNCTIONS      */
 
 // mallocs an uninitialised struct of type ebuData to store file information to
+// returns the data struct
 ebcData *mallocEbc()
 {
     ebcData *data = (ebcData *) malloc(sizeof(ebcData));

@@ -15,6 +15,7 @@ int noArguements(int argc, char **argv)
     {
         // obtaining the executable name without the ./ at the beginning. 
         // this was adapted from a query asked to ChatGPT, asking "how to i take out the ./ from ./ebfComp"
+        // overwrites the beginning of the string using memmove, omitting the "./"
         char *executableName = argv[0];
         int length = strlen(executableName);
         memmove(executableName, executableName + 2, length - 1);
@@ -27,99 +28,116 @@ int noArguements(int argc, char **argv)
     return 0;
 }
 
+
 /*      BAD ARGUEMENTS      */
 // validate that user has enter 2 arguments (plus the executable name)
 // Returns 1 if the wrong amount of arguements are provided
 int badArguements(int argc)
 {
+    // check arg count
     if (argc != 3)
-    { // check arg count
+    { 
         printf("ERROR: Bad Arguments\n");
         return 1;
-    } // check arg count
+    } 
 
     return 0;
 }
+
 
 /*      BAD FILE      */
 // check file opened successfully
 // returns 1 if bad file is given
 int badFile(FILE *file, char *filename)
 {
+    // check file pointer
     if (!file)
-    { // check file pointer
+    {
         printf("ERROR: Bad File Name (%s)\n", filename);
         return 1;
-    } // check file pointer
+    }
 
     return 0;
 }
 
+
 /*      BAD MAGIC NUMBER        */
-// checking against the casted value due to endienness
+
+// checking against known ebf magic number
 // returns 1 if magic number doesnt match known value
 int badMagicNumberEbf(unsigned short *magicNumberValue, char *filename)
 {
+    // check magic number
     if (*magicNumberValue != MAGIC_NUMBER_EBF)
-    { // check magic number
+    {
         printf("ERROR: Bad Magic Number (%s)\n", filename);
         return 1;
-    } // check magic number
+    }
 
     return 0;
 }
 
+// checking against known ebu magic number
+// returns 1 if magic number doesnt match known value
 int badMagicNumberEbu(unsigned short *magicNumberValue, char *filename)
 {
+    // check magic number
     if (*magicNumberValue != MAGIC_NUMBER_EBU)
-    { // check magic number
+    {
         printf("ERROR: Bad Magic Number (%s)\n", filename);
         return 1;
-    } // check magic number
+    }
 
     return 0;
 }
 
+// checking against known ebc magic number
+// returns 1 if magic number doesnt match known value
 int badMagicNumberEbc(unsigned short *magicNumberValue, char *filename)
 {
+    // check magic number
     if (*magicNumberValue != MAGIC_NUMBER_EBC)
-    { // check magic number
+    {
         printf("ERROR: Bad Magic Number (%s)\n", filename);
         return 1;
-    } // check magic number
+    }
 
     return 0;
 }
+
 
 /*      BAD DIMENSIONS      */
 // check dimensions to see if 2 values have been captured, and if dimensions are within acceptable range
 // returns 1 if requirements arent met
 int badDimensions(int height, int width, int checkValue, char *filename)
 {
+    // check dimensions
     if (checkValue != 2 || height < MIN_DIMENSION || width < MIN_DIMENSION || height > MAX_DIMENSION || width > MAX_DIMENSION)
-    { // check dimensions
-        // close the file as soon as an error is found
+    {
         // print appropriate error message and return
         printf("ERROR: Bad Dimensions (%s)\n", filename);
         return 1;
-    } // check dimensions
+    }
 
     return 0;
 }
+
 
 /*      BAD MALLOC      */
 // checks if malloc has sucessfully allocated memory
 // returns 1 if failed
 int badMalloc(void *mallocData)
 {
+    // check malloc
     if (mallocData == NULL)
-    { // check malloc
+    { 
         printf("ERROR: Image Malloc Failed\n");
         return 1;
-    } // check malloc
+    }
 
     return 0;
 }
+
 
 /*      BAD DATA        */
 
@@ -127,6 +145,7 @@ int badMalloc(void *mallocData)
 // returns 1 if end of file has not been reached
 int endOfFile(FILE *file, char *filename)
 {
+    // checking end of file
     if (feof(file))
     {
         printf("ERROR: Bad Data (%s)\n", filename);
@@ -140,6 +159,7 @@ int endOfFile(FILE *file, char *filename)
 // returns 1 if end of file has not been reached
 int notEndOfFile(FILE *file, char *filename)
 {
+    // checking for not end of file
     if (!feof(file))
     {
         printf("ERROR: Bad Data (%s)\n", filename);
@@ -150,10 +170,12 @@ int notEndOfFile(FILE *file, char *filename)
 }
 
 /*      SPECIALISED FOR EBF REALTED FILES       */
+
 // check if pixel value is out of bounds
 // returns 1 if pixel value is out of bounds
 int badPixelValue(int pixel, char *filename)
 {
+    // checking pixel value
     if (pixel < MIN_PIXEL_VALUE || pixel > MAX_PIXEL_VALUE)
     {
         printf("ERROR: Bad Data (%s)\n", filename);
@@ -167,6 +189,7 @@ int badPixelValue(int pixel, char *filename)
 // returns 1 if array size does not match the stated width from the file
 int wrongArraySize(int width, int arraySize, char *filename)
 {
+    // checking array size 
     if (arraySize != width)
     {
         printf("ERROR: Bad Data (%s)\n", filename);
@@ -180,20 +203,8 @@ int wrongArraySize(int width, int arraySize, char *filename)
 // returns 1 if there are not enough lines in the file
 int noMoreLines(void *array, char *filename)
 {
+    // chekcing for no more lines read
     if (array == NULL)
-    {
-        printf("ERROR: Bad Data (%s)\n", filename);
-        return 1;
-    }
-
-    return 0;
-}
-
-// checks if there are too many lines inside the file (height given is greater than actual height of file)
-// returns 1 if there are too many lines in the file
-int tooManyLines(void *array, char *filename)
-{
-    if (array != NULL)
     {
         printf("ERROR: Bad Data (%s)\n", filename);
         return 1;
@@ -218,7 +229,8 @@ int badByteRead(int count, char *filename)
 }
 
 /*      SPECIALISED FOR COMPRESSED BINARY RELATED FILES        */
-// compares the amount of decompressed bytes retuned by the conversion algorithm agaisnt the expected numBytes
+// compares the amount of decompressed bytes returned by the conversion algorithm against the expected numBytes
+// returns 1 if the count does not match the expected numBytes
 int badNumBytes(long count, long numBytesUncompressed, char *filename)
 {
     if (count != numBytesUncompressed)
@@ -250,7 +262,7 @@ int badOutput(int check)
 
 /*      BAD FILE FORMAT     */
 // functions in this header checks if the format of the input file is correct
-// information derived from the pgm document provided by github
+// information derived from the pgm document provided by github README document
 int noWhitespaceOrNull(char character)
 {
     int asciiValue = (int) character;

@@ -28,7 +28,7 @@ int outputFileData(ebfData *data, char *filename, FILE *outputFile)
 }
 
 
-// writes the header data and length, width parameters to the output file
+// writes the header name and length, width parameters to the output file
 // returns error code if output has failed, 0 otherwise
 int outputHeader(unsigned char *magicNumber, int height, int width, FILE *outputFile)
 {
@@ -50,7 +50,7 @@ int outputImageData(unsigned int **imageData, int height, int width, FILE *outpu
     { // writing out row
         for (int currentColumn = 0; currentColumn < width; currentColumn++)
         { // writing out column
-            // validate if output to file was sucessful
+            // output to file and validate for success
             if (badOutput(fprintf(outputFile, "%u", imageData[currentRow][currentColumn])))
             { // check write
                 return BAD_OUTPUT;
@@ -115,7 +115,6 @@ int outputImageDataEbfDirectEbu(unsigned int **imageData, int height, int width,
             // convert pixel value to binary format
             BYTE pixelValueByte = convertEbf2Ebu(imageData[currentRow][currentColumn]);
             // run and check if the output was successful
-            // BYTE pixelValueByte = 0x00;
             if (badOutput((int) fwrite(&pixelValueByte, sizeof(BYTE), 1, outputFile)))
             { // check write
                 return BAD_OUTPUT;
@@ -214,7 +213,7 @@ int outputFileDataBinary(ebuData *data, char *filename, FILE *outputFile)
 // returns error code if output has failed, 0 if successful
 int outputImageDataBinary(BYTE *dataBlock, long numBytes, FILE *outputFile)
 {
-    // write the entire dataBlock to the file
+    // write the entire dataBlock to the file and validate for success
     if (badOutput(fwrite(dataBlock, numBytes, 1, outputFile)))
     {
         return 1;
@@ -295,16 +294,17 @@ int outputFileDataCompressedBinary(ebcData *data, char *filename, FILE *outputFi
         return BAD_OUTPUT;
     }
     // output image data to file and validate for success (0 means success)
-    else if (outputImageDataBinary(data->dataBlockCompressed, data->numBytesCompressed, outputFile) != 0)
+    int errCode = outputImageDataBinary(data->dataBlockCompressed, data->numBytesCompressed, outputFile);
+    if (errCode != 0)
     {
-        return BAD_OUTPUT;
+        return errCode;
     }
 
     return 0;
 }
 
 
-// function takes all data for ebu file and outputs it to ebc file
+// function takes all data for ebc file and outputs it to ebu file
 // returns respective error codes if failed, 0 if otherwise
 int outputFileDataEbcDirectEbu(ebcData *data, char *filename, FILE *outputFile)
 {

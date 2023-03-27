@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include "fileStructs.h"
 #include "conversionFunctions.h"
 
@@ -19,14 +17,13 @@ unsigned int convertEbu2Ebf(BYTE pixelValueBinary)
     return pixelValue;
 }
 
-
 // function converts an array of uncompressed binary pixels to compressed binary format 
 BYTE *convertEbu2Ebc(BYTE *uncompressedPixelValues, BYTE *compressedBinaryArray, int numBytes)
 {    
     // variables for storing and tracking compressed binary information
     BYTE storageByte = 0;
     int compressedBitPostitionTracker = 0;
-    int compressedBinaryArrayPostitionTracker = 0;
+    long compressedBinaryArrayPostitionTracker = 0;
 
     // for every byte stored inside the uncompressed byte array
     for (int byteNumber = 0; byteNumber < numBytes; byteNumber++)
@@ -34,7 +31,7 @@ BYTE *convertEbu2Ebc(BYTE *uncompressedPixelValues, BYTE *compressedBinaryArray,
         // for the first 5 bits inside the selected byte, starting at byte 5
         for (int bitNumber = MAX_BITS_IN_UNCOMPRESSED_BYTE; bitNumber > 0; bitNumber--)
         {
-            // grab the least significant bit at the position bitNumber
+            // grab the bit at the position bitNumber
             int bitAtBitNumber = (uncompressedPixelValues[byteNumber] >> (bitNumber - 1)) & 0x01;
             // overwrite the storageByte to contain the LSB and the information of the storageByte at correct positions
             storageByte = (storageByte << 1) | bitAtBitNumber;
@@ -55,7 +52,7 @@ BYTE *convertEbu2Ebc(BYTE *uncompressedPixelValues, BYTE *compressedBinaryArray,
         }
     }
 
-    // shift bytes to remaining positions
+    // shift bytes to remaining positions in case the byte isnt full
     storageByte = (storageByte << (MAX_BITS_IN_BYTE - compressedBitPostitionTracker));
 
     // output final byte to the compressed array
@@ -66,7 +63,7 @@ BYTE *convertEbu2Ebc(BYTE *uncompressedPixelValues, BYTE *compressedBinaryArray,
 
 // function converts an array of compressed binary pixels to uncompressed binary format
 // works within the data struct since arrays for both compressed and uncompressed binary arrays have been defined
-// reason for this: need to check amount of pixels, so only way to do that is to decompress image data
+// reason for this: need to check for amount of pixels, so only way to do that is to decompress image data
 long convertEbc2Ebu(ebcData *data)
 {
     // variables for storing and tracking compressed binary information
@@ -91,7 +88,7 @@ long convertEbc2Ebu(ebcData *data)
             if (uncompressedBitPostitionTracker == MAX_BITS_IN_UNCOMPRESSED_BYTE)
             {
                 // accounting for the problem where if the algorithm reaches the end of the array, NULL chars may be picked up
-                // this happens when the compressed array has numBytesCompressed that isnt divisible by 1/COMPRESSION_FACTOR
+                // this happens when the compressed array has numBytesCompressed that isnt divisible by the COMPRESSION_FACTOR
                 if (!(storageByte == 0 && uncompressedBinaryArrayPostitionTracker >= data->numBytesUncompressed))
                 {
                     // write the storageByte to the uncompressed array and increment the array to the next position

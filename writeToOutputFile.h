@@ -1,17 +1,21 @@
 // contains function prototypes for anything to do with writing to the output file
 // output header and image data functions take in individual variables rather than the whole struct to improve modularity (intentional design choice)
 
+// used with all functions to output file header and dimensions
+int outputHeader(unsigned char *magicNumber, int height, int width, FILE *outputFile);
+
+
 // for ebf to ebf outputs
 int outputFileData(ebfData *data, char *filename, FILE *outputFile);
 
-int outputHeader(unsigned char *magicNumber, int height, int width, FILE *outputFile);
-
 int outputImageData(unsigned int **imageData, int height, int width, FILE *outputFile);
+
 
 // for ebf to ebu outputs
 int outputFileDataEbfDirectEbu(ebfData *data, char *filename, FILE *outputFile);
 
 int outputImageDataEbfDirectEbu(unsigned int **imageData, int height, int width, FILE *outputFile);
+
 
 // for ebu to ebf outputs
 int outputFileDataEbuDirectEbf(ebuData *data, char *filename, FILE *outputFile);

@@ -41,18 +41,18 @@ int getFileData(ebfData *inputData, char* filename, FILE *inputFile)
 
     // set up data array to store pixel values later
     // checks for any error codes that may have been returned
-    check = setImageDataArray(inputData);
-    if (check != 0)
+    errCode = setImageDataArray(inputData);
+    if (errCode != 0)
     {
-        return check;
+        return errCode;
     }
 
     // get image data from the file and store it to the struct 
     // checks for any error codes that may have been returned
-    check = getImageDataArray(inputData, inputFile, filename);
-    if (check != 0)
+    errCode = getImageDataArray(inputData, inputFile, filename);
+    if (errCode != 0)
     {
-        return check;
+        return errCode;
     }
 
     // return 0 for success
@@ -64,9 +64,11 @@ int getFileData(ebfData *inputData, char* filename, FILE *inputFile)
 // returns 100 if the file format is wrong after reading in the magic number
 int getMagicNumber(FILE *inputFile, unsigned char *magicNumber)
 {
+    // grab magic numbers
     magicNumber[0] = getc(inputFile);
     magicNumber[1] = getc(inputFile);
 
+    // check for correct file format
     if (noWhitespaceOrNull(getc(inputFile)))
     {
         return MISCELLANEOUS;
@@ -76,10 +78,10 @@ int getMagicNumber(FILE *inputFile, unsigned char *magicNumber)
 }
 
 
-// finds magic number value
+// finds and returns magic number value
 unsigned short *getMagicNumberValue(unsigned char *magicNumber)
 {
-    // casting chars to unsigned short 
+    // casting chars to unsigned short to get magic number value
     unsigned short *magicNumberValue = (unsigned short *) magicNumber;
     return magicNumberValue;   
 }
@@ -102,7 +104,7 @@ int setImageDataArray(ebfData *data)
 {
     // caclulate total size and allocate memory for array
     data->numBytes = data->height * data->width;
-    data->imageData = (unsigned int **) malloc(data->numBytes * sizeof(unsigned int*));
+    data->imageData = (unsigned int **) malloc(data->numBytes * sizeof(unsigned int *));
 
     // if malloc is unsuccessful, it will return a BAD MALLOC error code
     if (badMalloc(data->imageData))
@@ -111,7 +113,7 @@ int setImageDataArray(ebfData *data)
     } // check malloc
 
     // data block malloc'd to set up 2D array for imageData
-    data->dataBlock = (unsigned int*) malloc(data->numBytes * sizeof(unsigned int));
+    data->dataBlock = (unsigned int *) malloc(data->numBytes * sizeof(unsigned int));
 
     // if malloc is unsucessful, it will return a null pointer
     if (badMalloc(data->dataBlock))
@@ -131,10 +133,10 @@ int setImageDataArray(ebfData *data)
 // works in line by line fashion, in case height and width of pixels doesnt match the specified parameters
 int getImageDataArray(ebfData *data, FILE *inputFile, char *filename)
 {
-
+    // initialise array to null
     unsigned int *inputIntArray = NULL;
     // set up quantity for worst case scenario of integer line ups (2 digit ints plus space across the width, with newline char at the end)
-    long Max_Char_Bytes = sizeof(char)*3*(data->width + 1);
+    long Max_Char_Bytes = sizeof(char) * 3 * (data->width + 1);
     // malloc empty buffer to store 1 line of data into as type char *
     char *input = (char *) malloc(Max_Char_Bytes);
 
@@ -154,6 +156,7 @@ int getImageDataArray(ebfData *data, FILE *inputFile, char *filename)
     // used to store numbers when converted from char *input array
     inputIntArray = (unsigned int *) malloc(sizeof(unsigned int) * (data->width + 1));
 
+    // if malloc is unsucessful, it will return a null pointer
     if (badMalloc(inputIntArray))
     { // check malloc
         freeEbfReadDataArrays(input, inputIntArray); 
@@ -214,7 +217,7 @@ int getImageDataArray(ebfData *data, FILE *inputFile, char *filename)
         }
     }
 
-    // check if end of file has been reached
+    // BAD DATA CHECK: check if end of file has been reached (no more lines to read from)
     if (notEndOfFile(inputFile, filename))
     {
         freeEbfReadDataArrays(input, inputIntArray);
@@ -260,18 +263,18 @@ int getFileDataBinary(ebuData *inputData, char* filename, FILE *inputFile)
 
     // set up data array to store pixel values later
     // checks for any error codes that may have been returned
-    check = setBinaryImageDataArrayEbu(inputData);
-    if (check != 0)
+    errCode = setBinaryImageDataArrayEbu(inputData);
+    if (errCode != 0)
     {
-        return check;
+        return errCode;
     }
 
     // get image data from the file and store it to the struct 
     // checks for any error codes that may have been returned
-    check = getBinaryImageDataArray(inputData, inputFile, filename);
-    if (check != 0)
+    errCode = getBinaryImageDataArray(inputData, inputFile, filename);
+    if (errCode != 0)
     {
-        return check;
+        return errCode;
     }
 
     // return 0 for success
@@ -406,10 +409,10 @@ int getFileDataCompressedBinary(ebcData *inputData, char* filename, FILE *inputF
 // returns any error code that may arise during the malloc, 0 for no errors
 int setCompressedBinaryImageDataArrayEbc(ebcData *data)
 {
-    // caclulate total size and allocate memory for array
+    // caclulate total size for uncompressed array
     data->numBytesUncompressed = data->height * data->width;
 
-
+    // calculates numBytesCompressed 
     // extra bit of logic to account for any overhead in the file
     // if there is a remainder from numBytesUncompressed, there is an extra byte that is storing information that needs to be collected
     if (fmod(data->numBytesUncompressed, COMPRESSION_FACTOR) != 0.0)
