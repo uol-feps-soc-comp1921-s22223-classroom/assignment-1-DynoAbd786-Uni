@@ -1,7 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 
 #include "fileStructs.h"
 #include "memoryManagement.h"
@@ -12,7 +9,7 @@
 
 
 int main(int argc, char **argv)
-{ // main
+{
     /*      CHEKCING ARGUEMENTS     */
 
     // Provide the user with correct usage if no arguements are provided
@@ -44,6 +41,7 @@ int main(int argc, char **argv)
     // check file opened successfully
     if (badFile(inputFile, inputFilename))
     { // check file pointer
+        // free data and exit
         freeEbfData(inputData);
         return BAD_FILE;
     } // check file pointer
@@ -88,4 +86,4 @@ int main(int argc, char **argv)
     freeEbfData(inputData);
     fclose(outputFile);
     return SUCCESS;
-} // main()
+}
