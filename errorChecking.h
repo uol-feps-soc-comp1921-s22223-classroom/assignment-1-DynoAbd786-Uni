@@ -19,23 +19,29 @@
 #define MIN_PIXEL_VALUE 0
 #define MAX_PIXEL_VALUE 31
 
-
+// checks arguements
 int noArguements(int argc, char **argv);
 
 int badArguements(int argc);
 
+// checks if file is open
 int badFile(FILE *file, char *filename);
 
+// checks magic number
 int badMagicNumberEbf(unsigned short *magicNumberValue, char *filename);
 
 int badMagicNumberEbu(unsigned short *magicNumberValue, char *filename);
 
 int badMagicNumberEbc(unsigned short *magicNumberValue, char *filename);
 
+// checks dimensions
 int badDimensions(int height, int width, int checkValue, char *filename);
 
+// checks success of malloc 
 int badMalloc(void *mallocData);
 
+// checks for bad data
+// ebf:
 int endOfFile(FILE *file, char *filename);
 
 int notEndOfFile(FILE *file, char *filename);
@@ -46,12 +52,15 @@ int wrongArraySize(int width, int arraySize, char *filename);
 
 int noMoreLines(void *array, char *filename);
 
-int tooManyLines(void *array, char *filename);
-
+// ebu:
 int badByteRead(int count, char *filename);
 
+// ebc:
 int badNumBytes(long count, long numBytesUncompressed, char *filename);
 
+// checks bad output
 int badOutput(int check);
 
+// miscellaneous checks 
+// checks file format 
 int noWhitespaceOrNull(char character);

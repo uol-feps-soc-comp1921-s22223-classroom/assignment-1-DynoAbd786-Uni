@@ -23,7 +23,6 @@ void freeEbuData(ebuData *data);
 void freeEbuDataArray(ebuData *dataToCompare[]);
 
 
-
 /*      EBC RELATED FUNCTIONS       */
 
 ebcData *mallocEbc();
