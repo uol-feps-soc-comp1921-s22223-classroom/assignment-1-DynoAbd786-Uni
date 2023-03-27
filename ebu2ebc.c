@@ -1,7 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 
 #include "fileStructs.h"
 #include "memoryManagement.h"
@@ -12,7 +9,7 @@
 
 
 int main(int argc, char **argv)
-{ // main
+{
     /*      CHEKCING ARGUEMENTS     */
 
     // Provide the user with correct usage if no arguements are provided
@@ -30,7 +27,7 @@ int main(int argc, char **argv)
 
     /*      TAKING INPUT FROM FILE      */
 
-    // malloc a struct of type ebfData to store data to
+    // malloc a struct of type ebuData to store data to
     ebuData *inputData = mallocEbu();
     // checking if struct has been malloc'd
     if (badMalloc(inputData))
@@ -44,6 +41,7 @@ int main(int argc, char **argv)
     // check file opened successfully
     if (badFile(inputFile, inputFilename))
     { // check file pointer
+        // free data and exit
         freeEbuData(inputData);
         return BAD_FILE;
     } // check file pointer
@@ -73,7 +71,7 @@ int main(int argc, char **argv)
     } // validate output file
 
     
-    // output to file
+    // output to ebc file
     errCode = outputFileDataEbuDirectEbc(inputData, outputFilename, outputFile);
     // checking for any error codes
     if (errCode != 0)
