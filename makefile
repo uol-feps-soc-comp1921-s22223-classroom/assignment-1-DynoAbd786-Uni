@@ -7,7 +7,8 @@ CC     = gcc
 # -Werror means 'make all warnings into errors' which means your code doesn't compile with warnings
 # this is a good idea when code quality is important
 # -g enables the use of GDB
-CFLAGS = -std=c99 -Wall -Werror -g -lm
+CFLAGS = -std=c99 -Wall -Werror -g -Wextra -lm
+LDLIBS = -lm
 # this is your list of executables which you want to compile with all
 EXE = ebfEcho ebfComp ebf2ebu ebuEcho ebuComp ebu2ebf ebu2ebc ebcEcho ebcComp ebc2ebu
 
@@ -43,52 +44,52 @@ clean:
 
 
 ebfEcho: ebfEcho.o errorChecking.o readFromInputFile.o writeToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o 
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) 
 
 errorChecking: errorChecking.o 
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) 
 
 writeToOutputFile: writeToOutputFile.o memoryManagement.o conversionFunctions.o errorChecking.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) 
 
 readFromInputFile: readFromInputFile.o memoryManagement.o conversionFunctions.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) 
 
 loadFiles: loadFiles.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) 
 
 memoryManagement: memoryManagement.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) 
 
 ebfComp: ebfComp.o memoryManagement.o loadFiles.o errorChecking.o readFromInputFile.o compareFiles.o conversionFunctions.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) 
 
 compareFiles: compareFiles.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS) 
 
 ebf2ebu: ebf2ebu.o errorChecking.o readFromInputFile.o writeToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
 
 conversionFunctions: conversionFunctions.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
 
 ebuEcho: ebuEcho.o errorChecking.o readFromInputFile.o writeToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
 
 ebuComp: ebuComp.o memoryManagement.o loadFiles.o errorChecking.o readFromInputFile.o compareFiles.o conversionFunctions.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
 
 ebu2ebf: ebu2ebf.o errorChecking.o readFromInputFile.o writeToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
 
 ebu2ebc: ebu2ebc.o errorChecking.o readFromInputFile.o writeToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
 
 ebcEcho: ebcEcho.o errorChecking.o readFromInputFile.o writeToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
 
 ebcComp: ebcComp.o memoryManagement.o loadFiles.o errorChecking.o readFromInputFile.o compareFiles.o conversionFunctions.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
 
 ebc2ebu: ebc2ebu.o errorChecking.o readFromInputFile.o writeToOutputFile.o loadFiles.o memoryManagement.o conversionFunctions.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
